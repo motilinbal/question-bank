@@ -1,0 +1,33 @@
+{
+  "source_name": "UWorld",
+  "source_description": "A popular question bank for medical students.",
+  "questions": [
+    {
+      "question_id": "uw-med-123",
+      "text": "A 45-year-old patient presents with chest pain. An ECG is shown below. %%EXHIBIT_1%% What is the most likely diagnosis?",
+      "tags": ["cardiology", "ecg", "mi"],
+      "media": [
+        {
+          "media_id": "uw-ecg-456",
+          "type": "image",
+          "placeholder": "%%EXHIBIT_1%%",
+          "asset_path": "assets/import_source/ecg-456.jpg",
+          "description": "ECG showing ST-segment elevation."
+        }
+      ]
+    },
+    {
+      "question_id": "uw-pharm-789",
+      "text": "What is the mechanism of action for the drug described in the attached page? %%PAGE_1%%",
+      "tags": ["pharmacology", "moa"],
+      "media": [
+        {
+          "media_id": "uw-drug-info-101",
+          "type": "page",
+          "placeholder": "%%PAGE_1%%",
+          "content": "<h1>Aspirin</h1><p>Aspirin works by inhibiting cyclooxygenase (COX) enzymes, which leads to reduced production of prostaglandins. This accounts for its anti-inflammatory, analgesic, and antipyretic effects.</p>"
+        }
+      ]
+    }
+  ]
+}

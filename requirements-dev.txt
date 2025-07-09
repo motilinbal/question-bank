@@ -1,0 +1,5 @@
+# requirements-dev.txt
+pytest
+pytest-mock
+black
+flake8
