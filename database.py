@@ -54,7 +54,11 @@ class Database:
         collection = self.get_collection(collection_name)
         if collection is not None:
             try:
-                return collection.find_one({"_id": ObjectId(document_id)})
+                # Try ObjectId first, then fall back to string ID
+                try:
+                    return collection.find_one({"_id": ObjectId(document_id)})
+                except:
+                    return collection.find_one({"_id": document_id})
             except Exception:
                 return None
         return None
@@ -64,12 +68,28 @@ class Database:
         collection_name: str,
         query: Dict[str, Any],
         projection: Dict[str, Any] = None,
+        skip: int = 0,
+        limit: int = 0,
     ) -> List[Dict[str, Any]]:
-        """Finds multiple documents matching a query."""
+        """Finds multiple documents matching a query with pagination support."""
         collection = self.get_collection(collection_name)
         if collection is not None:
-            return list(collection.find(query, projection))
+            cursor = collection.find(query, projection)
+            if skip > 0:
+                cursor = cursor.skip(skip)
+            if limit > 0:
+                cursor = cursor.limit(limit)
+            return list(cursor)
         return []
+
+    def count_documents(
+        self, collection_name: str, query: Dict[str, Any]
+    ) -> int:
+        """Counts documents matching a query without fetching them."""
+        collection = self.get_collection(collection_name)
+        if collection is not None:
+            return collection.count_documents(query)
+        return 0
 
     def update_document(
         self, collection_name: str, document_id: str, updates: Dict[str, Any]
@@ -77,18 +97,34 @@ class Database:
         """Updates a document by its _id."""
         collection = self.get_collection(collection_name)
         if collection is not None:
-            result = collection.update_one(
-                {"_id": ObjectId(document_id)}, {"$set": updates}
-            )
-            return result.matched_count > 0
+            try:
+                # Try ObjectId first, then fall back to string ID
+                try:
+                    result = collection.update_one(
+                        {"_id": ObjectId(document_id)}, {"$set": updates}
+                    )
+                except:
+                    result = collection.update_one(
+                        {"_id": document_id}, {"$set": updates}
+                    )
+                return result.matched_count > 0
+            except Exception:
+                return False
         return False
 
     def delete_document(self, collection_name: str, document_id: str) -> bool:
         """Deletes a document by its _id."""
         collection = self.get_collection(collection_name)
         if collection is not None:
-            result = collection.delete_one({"_id": ObjectId(document_id)})
-            return result.deleted_count > 0
+            try:
+                # Try ObjectId first, then fall back to string ID
+                try:
+                    result = collection.delete_one({"_id": ObjectId(document_id)})
+                except:
+                    result = collection.delete_one({"_id": document_id})
+                return result.deleted_count > 0
+            except Exception:
+                return False
         return False
 
     def close(self):

@@ -10,9 +10,9 @@ MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
 DB_NAME = os.getenv("DB_NAME", "documedica_refactored")
 
 # --- Collection Names ---
-QUESTIONS_COLLECTION = "questions"
-MEDIA_COLLECTION = "media"
-SOURCES_COLLECTION = "sources"
+QUESTIONS_COLLECTION = "Questions"
+MEDIA_COLLECTION = "Images"  # We'll need to check your data structure
+SOURCES_COLLECTION = "sources"  # This might need to be created
 
 # --- Asset Paths ---
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets")
