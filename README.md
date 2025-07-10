@@ -1,144 +1,164 @@
-# DocuMedica Refactored
+# DocuMedica - Medical Question Bank Viewer
 
-A lean, robust, and modern standalone Python application for managing and viewing a medical question bank. This project uses MongoDB for data storage and Streamlit for the user interface.
+![DocuMedica Banner](https://i.imgur.com/placeholder.png) <!-- Placeholder for a real banner -->
 
-## ✨ Features
+**DocuMedica** is a standalone, local-first Python application for managing and viewing a medical question bank. It provides a clean, fast, and interactive web interface powered by Streamlit, with a robust backend that uses MongoDB for data storage.
 
--   **Advanced Filtering**: Search questions by text, source, and tags.
--   **Question Management**: Mark questions as favorite, flag them for review, and add personal notes.
--   **Rich Media Support**: View questions with embedded images, videos, audio, and formatted text pages.
--   **Data Ingestion**: A powerful service to import new questions from a structured JSON format.
--   **Modern UI**: A clean, fast, and intuitive web-based interface powered by Streamlit.
+---
 
-## ⚙️ Prerequisites
+## ✨ Key Features
 
--   Python 3.8+
--   MongoDB Server (running locally or on a cloud service like MongoDB Atlas).
+* **Advanced Filtering**: Search and filter questions by text, source, tags, favorites, and review status.
+* **Interactive Question Viewer**: View questions with rich media (images, videos), explanations, and choices in a clean, readable format.
+* **Personalization**: Mark questions as favorites, flag them for review, and add personal notes.
+* **Local-First**: Runs entirely on your local machine, ensuring your data remains private and accessible offline.
+* **Data Ingestion**: Includes a service to easily import questions from a structured JSON format.
+* **Modern & Robust**: Built with modern tools like Pydantic for data validation and a layered architecture for maintainability.
 
-## 🚀 Installation & Setup
+---
 
-1.  **Clone the repository:**
+## 📸 Screenshots
+
+| Question List View                               | Detailed Question View                            |
+| ------------------------------------------------ | ------------------------------------------------- |
+| ![List View](https://i.imgur.com/placeholder.png) | ![Detail View](https://i.imgur.com/placeholder.png) |
+
+<!-- Placeholder for real screenshots -->
+
+---
+
+## 🛠️ Tech Stack
+
+* **Backend**: Python
+* **Frontend/UI**: Streamlit
+* **Database**: MongoDB
+* **Data Validation**: Pydantic
+* **Configuration**: Pydantic-Settings
+* **Testing**: Pytest, Pytest-mock
+* **Code Quality**: Black, Flake8
+
+---
+
+## 🚀 Getting Started
+
+Follow these instructions to set up and run the project on your local machine.
+
+### Prerequisites
+
+* Python 3.9+
+* A running instance of MongoDB. You can run it locally or use a free cloud instance (e.g., from MongoDB Atlas).
+* Git
+
+### Installation & Setup
+
+1.  **Clone the Repository**
     ```bash
-    git clone <your-repo-url>
-    cd documedica_refactored
+    git clone [https://github.com/your-username/documedica.git](https://github.com/your-username/documedica.git)
+    cd documedica
     ```
 
-2.  **Create and activate a virtual environment:**
+2.  **Create and Activate a Virtual Environment**
+    This project is designed to run in a dedicated virtual environment to manage dependencies.
     ```bash
-    python -m venv .venv
-    source .venv/bin/activate  # On Windows, use: .\.venv\Scripts\activate
+    # Create the virtual environment (named 'venv')
+    python3 -m venv venv
+
+    # Activate it on macOS/Linux
+    source venv/bin/activate
+
+    # Or, activate it on Windows (Command Prompt)
+    .\venv\Scripts\activate
     ```
 
-3.  **Install dependencies:**
+3.  **Install Dependencies**
+    Install all required Python packages.
     ```bash
     pip install -r requirements.txt
     ```
 
-4.  **Configure your environment:**
-    -   Copy the `.env.example` file to `.env`.
-    -   Update the `MONGO_URI` and `DB_NAME` variables in the `.env` file to point to your MongoDB instance.
+4.  **Configure Environment Variables**
+    The application uses a `.env` file to manage configuration, especially database credentials.
+    * Create a file named `.env` in the root of the project directory.
+    * Add your configuration details to it. You can use the example below as a template.
 
-## 🏃‍♀️ Running the Application
+    **.env file:**
+    ```env
+    # Your MongoDB connection string
+    MONGO_URI="mongodb://localhost:27017/"
 
-1.  **(First Time Only) Ingest Data:**
-    -   Place your data file (e.g., `sample_import.json`) in the project root.
-    -   Ensure any local media files are referenced with correct paths inside the JSON.
-    -   Run the ingestion script:
-        ```python
-        from services import IngestionService
-        ingestion_service = IngestionService()
-        ingestion_service.import_from_json("sample_import.json")
-        ```
+    # The name of the database to use
+    MONGO_DB_NAME="question_bank"
 
-2.  **Launch the User Interface:**
+    # The name of the main questions collection
+    MONGO_COLLECTION_NAME="questions"
+    ```
+
+5.  **Import Sample Data (Optional)**
+    To populate your database with initial data, you can run the ingestion script.
+    ```bash
+    # Make sure your .env file is configured correctly first
+    python -m scripts.import_data sample_import.json
+    ```
+    *(Note: The script path might vary; adjust as needed based on project structure.)*
+
+6.  **Run the Application**
+    Launch the Streamlit web server.
     ```bash
     streamlit run main.py
     ```
-    The application will open automatically in your web browser.
+    The application should now be open and accessible in your default web browser!
+
+---
 
 ## 📂 Project Structure
 
-```
-/
-|-- assets/             # For storing media files (images, videos, audio)
-|-- tests/              # Unit tests for the application
-|-- config.py           # Application configuration loader
-|-- database.py         # Handles all MongoDB interactions
-|-- main.py             # The main Streamlit application UI
-|-- models.py           # Pydantic data models for validation
-|-- services.py         # Core business logic (ingestion, question management)
-|-- requirements.txt    # Production dependencies
-|-- requirements-dev.txt # Development dependencies
-|-- README.md           # This file
-```
+The project follows a layered architecture to ensure a clean separation of concerns.
 
-## 🧪 Development
+.├── assets/             # Static media files (images, videos)
+│   └── ...
+├── docs/               # Detailed documentation files
+│   └── technical_overview.md
+├── scripts/            # Helper scripts (e.g., data importer)
+│   └── ...
+├── tests/              # Unit and integration tests
+│   └── ...
+├── config.py           # Application configuration loader
+├── database.py         # Data Access Layer (MongoDB singleton)
+├── main.py             # UI Layer (Streamlit application)
+├── models.py           # Data Modeling Layer (Pydantic models)
+├── README.md           # This file
+├── requirements.txt    # Application dependencies
+├── services.py         # Business logic for the new schema
+├── updated_legacy_adapter.py # Adapter for legacy DB schema
+└── updated_question_service.py # Business logic used by the UI
+---
 
-### Running Tests
+## ✅ Testing & Quality
 
-```bash
-# Install development dependencies
-pip install -r requirements-dev.txt
+To ensure the reliability of the application, we use `pytest` for testing and `black`/`flake8` for code quality.
 
-# Run all tests
-pytest
+1.  **Install Development Dependencies**
+    ```bash
+    pip install -r requirements-dev.txt
+    ```
 
-# Run tests with coverage
-pytest --cov=.
-```
+2.  **Run Tests**
+    Execute the full test suite:
+    ```bash
+    pytest
+    ```
 
-### Code Quality
+3.  **Check Code Quality**
+    ```bash
+    # Format code with Black
+    black .
 
-```bash
-# Format code
-black .
+    # Lint code with Flake8
+    flake8 .
+    ```
 
-# Check code quality
-flake8 .
-```
+---
 
-## 📊 Data Format
+## 📖 Further Documentation
 
-The application expects JSON data in the following format:
-
-```json
-{
-  "source_name": "UWorld",
-  "source_description": "A popular question bank for medical students.",
-  "questions": [
-    {
-      "question_id": "uw-med-123",
-      "text": "Question text with %%PLACEHOLDER%% for media",
-      "tags": ["cardiology", "ecg"],
-      "media": [
-        {
-          "media_id": "uw-ecg-456",
-          "type": "image",
-          "placeholder": "%%PLACEHOLDER%%",
-          "asset_path": "path/to/image.jpg",
-          "description": "ECG description"
-        }
-      ]
-    }
-  ]
-}
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Run the test suite
-6. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-- Built with [Streamlit](https://streamlit.io/) for the web interface
-- Uses [MongoDB](https://www.mongodb.com/) for data storage
-- Powered by [Pydantic](https://pydantic-docs.helpmanual.io/) for data validation
+For a deep dive into the application's architecture, data flow, and design decisions, please see the **[Comprehensive Technical Guide](./docs/technical_overview.md)**.
