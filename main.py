@@ -478,31 +478,66 @@ def display_question_detail():
     </div>
     """, unsafe_allow_html=True)
 
-    # --- Interactive Choices (clean choice text) ---
+    # --- Interactive Choices with Direct CSS Styling ---
     if question.choices:
-        # Create choice options with cleaned text
-        choice_options = []
-        choice_mapping = {}
-        for i, choice in enumerate(question.choices):
-            # Clean choice text using the same robust cleaning function
-            cleaned_choice_text = clean_html_content(choice.text)
-            # Remove any remaining HTML tags and get clean text
-            clean_choice_text = BeautifulSoup(cleaned_choice_text, 'html.parser').get_text(strip=True)
-            choice_display = f"{choice.id}. {clean_choice_text}"
-            choice_options.append(choice_display)
-            choice_mapping[choice_display] = choice
-        
-        # Radio button for choice selection
-        selected_choice_text = st.radio(
-            "Choices",
-            options=choice_options,
-            key=f"choices_{q_id}",
-            label_visibility="collapsed",
-            disabled=st.session_state.submitted
-        )
-        
-        if selected_choice_text:
-            st.session_state.selected_answer = choice_mapping[selected_choice_text]
+        if not st.session_state.submitted:
+            # Before submission: Use radio buttons for selection
+            choice_options = []
+            choice_mapping = {}
+            for i, choice in enumerate(question.choices):
+                # Clean choice text using the same robust cleaning function
+                cleaned_choice_text = clean_html_content(choice.text)
+                # Remove any remaining HTML tags and get clean text
+                clean_choice_text = BeautifulSoup(cleaned_choice_text, 'html.parser').get_text(strip=True)
+                choice_display = f"{choice.id}. {clean_choice_text}"
+                choice_options.append(choice_display)
+                choice_mapping[choice_display] = choice
+            
+            # Radio button for choice selection
+            selected_choice_text = st.radio(
+                "Choices",
+                options=choice_options,
+                key=f"choices_{q_id}",
+                label_visibility="collapsed"
+            )
+            
+            if selected_choice_text:
+                st.session_state.selected_answer = choice_mapping[selected_choice_text]
+        else:
+            # After submission: Show choices with color-coded borders
+            for choice in question.choices:
+                # Clean choice text
+                cleaned_choice_text = clean_html_content(choice.text)
+                clean_choice_text = BeautifulSoup(cleaned_choice_text, 'html.parser').get_text(strip=True)
+                
+                # Determine border color and style
+                border_color = "#ccc"  # Default gray
+                border_width = "1px"
+                
+                if choice.is_correct:
+                    # Correct answer gets green border
+                    border_color = "#28a745"
+                    border_width = "2px"
+                elif st.session_state.selected_answer and choice.id == st.session_state.selected_answer.id and not choice.is_correct:
+                    # User's incorrect choice gets red border
+                    border_color = "#dc3545"
+                    border_width = "2px"
+                
+                # Display choice with appropriate styling
+                st.markdown(f"""
+                <div style="
+                    border: {border_width} solid {border_color};
+                    border-radius: 10px;
+                    padding: 1rem 1.5rem;
+                    margin: 0.5rem 0;
+                    background: transparent;
+                    color: #FAFAFA;
+                    font-size: 16px;
+                    line-height: 1.5;
+                ">
+                    {choice.id}. {clean_choice_text}
+                </div>
+                """, unsafe_allow_html=True)
 
         # --- Submit Button (explanation loads instantly due to caching) ---
         if not st.session_state.submitted and st.session_state.selected_answer:
@@ -513,57 +548,6 @@ def display_question_detail():
                     st.session_state.show_explanation = True
                     st.rerun()
 
-        # --- Visual Feedback Only (Improved Script) ---
-        if st.session_state.submitted and st.session_state.selected_answer:
-            # Find correct answer
-            correct_choice = None
-            for choice in question.choices:
-                if choice.is_correct:
-                    correct_choice = choice
-                    break
-            
-            # Get clean text for comparison using robust cleaning
-            correct_cleaned_text = clean_html_content(correct_choice.text)
-            correct_clean_text = BeautifulSoup(correct_cleaned_text, 'html.parser').get_text(strip=True)
-            selected_cleaned_text = clean_html_content(st.session_state.selected_answer.text)
-            selected_clean_text = BeautifulSoup(selected_cleaned_text, 'html.parser').get_text(strip=True)
-            
-            # Determine if user was correct
-            user_correct = st.session_state.selected_answer.is_correct
-            
-            # Escape quotes for JavaScript
-            correct_text_escaped = correct_clean_text.replace("'", "\\'")
-            selected_text_escaped = selected_clean_text.replace("'", "\\'")
-            
-            # Apply visual styling with improved script
-            st.markdown(f"""
-            <script>
-                setTimeout(function() {{
-                    const labels = window.parent.document.querySelectorAll('label[data-baseweb="radio"]');
-                    const correctText = `{correct_choice.id}. {correct_text_escaped}`;
-                    const selectedText = `{st.session_state.selected_answer.id}. {selected_text_escaped}`;
-                    
-                    labels.forEach(label => {{
-                        const textDiv = label.querySelector('div[data-testid="stMarkdownContainer"] p');
-                        if (!textDiv) return;
-                        
-                        const choiceText = textDiv.textContent.trim();
-                        const container = label.closest('.stRadio > div > label');
-                        if (!container) return;
-
-                        // Apply correct answer styling (green border)
-                        if (choiceText === correctText) {{
-                            container.classList.add('correct-choice');
-                        }}
-                        
-                        // Apply incorrect answer styling (red border) if user selected wrong
-                        if (choiceText === selectedText && !{str(user_correct).lower()}) {{
-                            container.classList.add('incorrect-choice');
-                        }}
-                    }});
-                }}, 100);
-            </script>
-            """, unsafe_allow_html=True)
 
     # --- Explanation Section (loads instantly due to caching) ---
     if st.session_state.show_explanation and question.explanation_html:
