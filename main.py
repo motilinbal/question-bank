@@ -4,6 +4,7 @@ import config
 from updated_legacy_adapter import updated_legacy_adapter
 from updated_question_service import updated_question_service
 from bs4 import BeautifulSoup
+import re
 
 # --- Initial Page Config ---
 st.set_page_config(
@@ -25,15 +26,41 @@ def clean_html_content(html_string):
     """Clean HTML content to remove artifacts and malformed tags"""
     if not html_string:
         return ""
+    
     # Use BeautifulSoup to parse and clean the HTML
     soup = BeautifulSoup(html_string, 'html.parser')
-    # Remove any stray closing tags and clean up
+    
+    # Remove common problematic tags and attributes
+    for tag in soup.find_all():
+        # Remove style attributes that might cause display issues
+        if 'style' in tag.attrs:
+            del tag.attrs['style']
+        # Remove class attributes that might conflict
+        if 'class' in tag.attrs:
+            del tag.attrs['class']
+        # Remove id attributes
+        if 'id' in tag.attrs:
+            del tag.attrs['id']
+    
+    # Remove empty tags
+    for tag in soup.find_all():
+        if not tag.get_text(strip=True) and not tag.find_all(['img', 'br', 'hr']):
+            tag.decompose()
+    
+    # Get clean HTML
     cleaned = str(soup)
+    
     # Additional cleanup for common artifacts
-    cleaned = cleaned.replace("</div></div>", "")
-    cleaned = cleaned.replace("</div>", "")
-    cleaned = cleaned.replace("<div>", "")
-    return cleaned
+    cleaned = cleaned.replace("</div></div>", "</div>")
+    cleaned = cleaned.replace("<div></div>", "")
+    cleaned = cleaned.replace("<p></p>", "")
+    cleaned = cleaned.replace("<span></span>", "")
+    
+    # Remove multiple consecutive whitespace
+    cleaned = re.sub(r'\s+', ' ', cleaned)
+    cleaned = re.sub(r'>\s+<', '><', cleaned)
+    
+    return cleaned.strip()
 
 
 # --- Helper Functions ---
@@ -91,7 +118,7 @@ with st.sidebar:
     selected_tags = st.multiselect("Filter by Tags", options=all_tags)
     st.markdown("---")
     show_favorites_only = st.checkbox("Show Favorites Only ⭐")
-    show_marked_only = st.checkbox("Show Marked Only 🚩")
+    show_marked_only = st.checkbox("Show Marked Only 🔖")
 
     # --- Actions Section (only show when viewing a question) ---
     if st.session_state.selected_question_id is not None:
@@ -112,14 +139,14 @@ with st.sidebar:
         
         if question:
             # Favorite button
-            fav_text = "⭐ Favorited" if question.is_favorite else "☆ Favorite"
+            fav_text = "⭐ Favorited" if question.is_favorite else "⭐ Favorite"
             fav_type = "secondary" if question.is_favorite else "primary"
             if st.button(fav_text, type=fav_type, use_container_width=True):
                 question_service.toggle_favorite(st.session_state.selected_question_id)
                 st.rerun()
             
             # Mark button
-            mark_text = "🚩 Marked" if question.difficult else "🏳️ Mark"
+            mark_text = "🔖 Marked" if question.difficult else "🔖 Mark"
             mark_type = "secondary" if question.difficult else "primary"
             if st.button(mark_text, type=mark_type, use_container_width=True):
                 question_service.toggle_marked(st.session_state.selected_question_id)
@@ -278,13 +305,95 @@ def load_custom_css():
         .stRadio > div > label > div:last-child p {
             color: #FAFAFA !important;
         }
+        
+        /* Font size controls styling */
+        .font-control-btn {
+            background: #262730 !important; 
+            border: 1px solid #4A4A4A !important; 
+            color: #FAFAFA !important; 
+            border-radius: 5px !important; 
+            padding: 8px 12px !important; 
+            cursor: pointer !important;
+            font-size: 16px !important;
+            width: 100% !important;
+            transition: background-color 0.2s ease !important;
+        }
+        
+        .font-control-btn:hover {
+            background: #3A3A3A !important;
+        }
     </style>
+    
+    <script>
+        // Global font size variable
+        let currentFontSize = 18;
+        
+        // Function to change font size instantly
+        function changeFontSize(delta) {
+            currentFontSize = Math.max(12, Math.min(28, currentFontSize + delta));
+            
+            // Update question text
+            const questionText = document.querySelector('.question-text');
+            if (questionText) {
+                questionText.style.fontSize = currentFontSize + 'px';
+            }
+            
+            // Update explanation text
+            const explanationContent = document.querySelector('.explanation-content');
+            if (explanationContent) {
+                explanationContent.style.fontSize = (currentFontSize - 2) + 'px';
+            }
+        }
+        
+        // Function to show explanation instantly
+        function showExplanationInstantly() {
+            const explanationContainer = document.querySelector('.explanation-container');
+            if (explanationContainer) {
+                explanationContainer.style.display = 'block';
+                explanationContainer.style.opacity = '0';
+                explanationContainer.style.transition = 'opacity 0.3s ease-in-out';
+                setTimeout(() => {
+                    explanationContainer.style.opacity = '1';
+                }, 10);
+            }
+        }
+        
+        // Function to apply choice feedback instantly
+        function applyChoiceFeedback(correctChoiceId, selectedChoiceId, isCorrect) {
+            setTimeout(function() {
+                const labels = document.querySelectorAll('label[data-baseweb="radio"]');
+                
+                labels.forEach(label => {
+                    const textDiv = label.querySelector('div[data-testid="stMarkdownContainer"] p');
+                    if (!textDiv) return;
+                    
+                    const choiceText = textDiv.textContent.trim();
+                    const container = label.closest('.stRadio > div > label');
+                    if (!container) return;
+
+                    // Apply correct answer styling (green border)
+                    if (choiceText.startsWith(correctChoiceId + '.')) {
+                        container.style.borderColor = '#28a745';
+                        container.style.borderWidth = '2px';
+                        container.style.backgroundColor = 'transparent';
+                    }
+                    
+                    // Apply incorrect answer styling (red border) if user selected wrong
+                    if (choiceText.startsWith(selectedChoiceId + '.') && !isCorrect) {
+                        container.style.borderColor = '#dc3545';
+                        container.style.borderWidth = '2px';
+                        container.style.backgroundColor = 'transparent';
+                    }
+                });
+            }, 50);
+        }
+    </script>
     """
     st.markdown(css, unsafe_allow_html=True)
 
 # --- Main Content Area (Remove title when viewing question) ---
 if st.session_state.selected_question_id is None:
-    st.title("🩺 DocuMedica Question Bank")
+    st.title("🏥 DocuMedica Question Bank")
 
 
 def display_question_list():
@@ -357,7 +466,7 @@ def display_question_list():
             col1, col2 = st.columns([4, 1])
             with col1:
                 fav_icon = "⭐" if q.is_favorite else ""
-                mark_icon = "🚩" if q.difficult else ""
+                mark_icon = "🔖" if q.difficult else ""
                 st.markdown(f"**{q.question_id}** {fav_icon} {mark_icon}")
                 st.caption(f"Source: {q.source} | Tags: {', '.join(q.tags)}")
             with col2:
@@ -404,7 +513,7 @@ def display_pagination_controls(total_pages, position="top"):
 
 
 def display_question_detail():
-    """Displays an interactive question with sleek dark theme, instant performance, and visual-only feedback."""
+    """Displays an interactive question with instant feedback and no page reloads."""
     # Load custom CSS
     load_custom_css()
     
@@ -424,18 +533,18 @@ def display_question_detail():
         st.session_state.show_explanation = False
         st.session_state[f"current_q_{q_id}"] = True
 
-    # --- Font Size Controls (now instant due to caching) ---
+    # --- Font Size Controls (instant with JavaScript) ---
     col1, col2 = st.columns([10, 1])
     with col2:
         font_col1, font_col2 = st.columns(2)
         with font_col1:
-            if st.button("➕", help="Increase font size", key="font_plus"):
-                st.session_state.font_size = min(st.session_state.font_size + 2, 28)
-                st.rerun()
+            st.markdown("""
+            <button onclick="changeFontSize(2)" class="font-control-btn" title="Increase font size">+</button>
+            """, unsafe_allow_html=True)
         with font_col2:
-            if st.button("➖", help="Decrease font size", key="font_minus"):
-                st.session_state.font_size = max(st.session_state.font_size - 2, 12)
-                st.rerun()
+            st.markdown("""
+            <button onclick="changeFontSize(-2)" class="font-control-btn" title="Decrease font size">-</button>
+            """, unsafe_allow_html=True)
 
     # --- Clean Question HTML (remove all artifacts) ---
     cleaned_question_html = clean_html_content(question.question_html)
@@ -473,74 +582,55 @@ def display_question_detail():
         if selected_choice_text:
             st.session_state.selected_answer = choice_mapping[selected_choice_text]
 
-        # --- Submit Button (explanation loads instantly due to caching) ---
+        # --- Submit Button (instant feedback and explanation) ---
         if not st.session_state.submitted and st.session_state.selected_answer:
             col1, col2, col3 = st.columns([2, 1, 2])
             with col2:
-                if st.button("Submit", type="primary", use_container_width=True):
-                    st.session_state.submitted = True
-                    st.session_state.show_explanation = True
-                    st.rerun()
-
-        # --- Visual Feedback Only (Improved Script) ---
-        if st.session_state.submitted and st.session_state.selected_answer:
-            # Find correct answer
-            correct_choice = None
-            for choice in question.choices:
-                if choice.is_correct:
-                    correct_choice = choice
-                    break
-            
-            # Get clean text for comparison
-            correct_clean_text = BeautifulSoup(correct_choice.text, 'html.parser').get_text(strip=True)
-            selected_clean_text = BeautifulSoup(st.session_state.selected_answer.text, 'html.parser').get_text(strip=True)
-            
-            # Determine if user was correct
-            user_correct = st.session_state.selected_answer.is_correct
-            
-            # Escape quotes for JavaScript
-            correct_text_escaped = correct_clean_text.replace("'", "\\'")
-            selected_text_escaped = selected_clean_text.replace("'", "\\'")
-            
-            # Apply visual styling with improved script
-            st.markdown(f"""
-            <script>
-                setTimeout(function() {{
-                    const labels = window.parent.document.querySelectorAll('label[data-baseweb="radio"]');
-                    const correctText = `{correct_choice.id}. {correct_text_escaped}`;
-                    const selectedText = `{st.session_state.selected_answer.id}. {selected_text_escaped}`;
+                # Find correct answer for instant feedback
+                correct_choice = None
+                for choice in question.choices:
+                    if choice.is_correct:
+                        correct_choice = choice
+                        break
+                
+                user_correct = st.session_state.selected_answer.is_correct if st.session_state.selected_answer else False
+                
+                submit_onclick = f"""
+                    // Hide submit button
+                    this.style.display = 'none';
                     
-                    labels.forEach(label => {{
-                        const textDiv = label.querySelector('div[data-testid="stMarkdownContainer"] p');
-                        if (!textDiv) return;
-                        
-                        const choiceText = textDiv.textContent.trim();
-                        const container = label.closest('.stRadio > div > label');
-                        if (!container) return;
+                    // Apply choice feedback instantly
+                    applyChoiceFeedback('{correct_choice.id}', '{st.session_state.selected_answer.id}', {str(user_correct).lower()});
+                    
+                    // Show explanation instantly
+                    showExplanationInstantly();
+                """
+                
+                st.markdown(f"""
+                <button onclick="{submit_onclick}" style="
+                    background: #ff4b4b; 
+                    color: white; 
+                    border: none; 
+                    border-radius: 5px; 
+                    padding: 12px 24px; 
+                    font-size: 16px; 
+                    font-weight: 600; 
+                    cursor: pointer; 
+                    width: 100%;
+                    transition: background-color 0.2s ease;
+                " onmouseover="this.style.backgroundColor='#ff6b6b'" 
+                   onmouseout="this.style.backgroundColor='#ff4b4b'">Submit</button>
+                """, unsafe_allow_html=True)
 
-                        // Apply correct answer styling (green border)
-                        if (choiceText === correctText) {{
-                            container.classList.add('correct-choice');
-                        }}
-                        
-                        // Apply incorrect answer styling (red border) if user selected wrong
-                        if (choiceText === selectedText && !{str(user_correct).lower()}) {{
-                            container.classList.add('incorrect-choice');
-                        }}
-                    }});
-                }}, 100);
-            </script>
-            """, unsafe_allow_html=True)
-
-    # --- Explanation Section (loads instantly due to caching) ---
-    if st.session_state.show_explanation and question.explanation_html:
+    # --- Explanation Section (always rendered but hidden initially) ---
+    if question.explanation_html:
         # Clean explanation HTML
         cleaned_explanation_html = clean_html_content(question.explanation_html)
         
         st.markdown("---")
-        explanation_title = "💡 Explanation"
+        explanation_title = "&#129504; Explanation"
         st.markdown(f"""
-        <div class="explanation-container">
+        <div class="explanation-container" style="display: none;">
             <div class="explanation-title">
                 {explanation_title}
             </div>
