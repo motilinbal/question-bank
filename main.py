@@ -4,6 +4,7 @@ import config
 from updated_legacy_adapter import updated_legacy_adapter
 from updated_question_service import updated_question_service
 from bs4 import BeautifulSoup
+import re
 
 # --- Initial Page Config ---
 st.set_page_config(
@@ -15,24 +16,39 @@ st.set_page_config(
 # --- Initialize Services ---
 question_service = updated_question_service
 
-# --- Cached Question Function for Performance ---
-@st.cache_data
+# --- Question Function (removed caching to fix bug where all questions showed same content) ---
 def get_cached_question(question_id):
-    """Fetch and cache question data to avoid repeated database calls"""
+    """Fetch question data - caching removed to prevent showing wrong questions"""
     return question_service.get_question_by_id(question_id)
 
 def clean_html_content(html_string):
     """Clean HTML content to remove artifacts and malformed tags"""
     if not html_string:
         return ""
-    # Use BeautifulSoup to parse and clean the HTML
-    soup = BeautifulSoup(html_string, 'html.parser')
-    # Remove any stray closing tags and clean up
-    cleaned = str(soup)
-    # Additional cleanup for common artifacts
+    
+    # Remove the specific artifacts mentioned - handle various patterns
+    cleaned = html_string
+    
+    # Remove </div></div> as single string
     cleaned = cleaned.replace("</div></div>", "")
-    cleaned = cleaned.replace("</div>", "")
-    cleaned = cleaned.replace("<div>", "")
+    
+    # Remove line-separated </div> artifacts with various whitespace patterns
+    cleaned = re.sub(r'</div>\s*\n\s*</div>', '', cleaned)
+    cleaned = re.sub(r'</div>\s*</div>', '', cleaned)
+    
+    # Remove trailing orphaned </div> tags
+    cleaned = re.sub(r'</div>\s*$', '', cleaned.strip())
+    
+    # Remove multiple consecutive </div> tags
+    cleaned = re.sub(r'(</div>\s*){2,}', '', cleaned)
+    
+    # Remove <p> tags using regex for thorough cleaning
+    cleaned = re.sub(r'</?p[^>]*>', '', cleaned)
+    
+    # Clean up extra whitespace that might be left behind
+    cleaned = re.sub(r'\n\s*\n', '\n', cleaned)
+    cleaned = cleaned.strip()
+    
     return cleaned
 
 
@@ -455,8 +471,10 @@ def display_question_detail():
         choice_options = []
         choice_mapping = {}
         for i, choice in enumerate(question.choices):
-            # Clean choice text to remove <p> tags and other artifacts
-            clean_choice_text = BeautifulSoup(choice.text, 'html.parser').get_text(strip=True)
+            # Clean choice text using the same robust cleaning function
+            cleaned_choice_text = clean_html_content(choice.text)
+            # Remove any remaining HTML tags and get clean text
+            clean_choice_text = BeautifulSoup(cleaned_choice_text, 'html.parser').get_text(strip=True)
             choice_display = f"{choice.id}. {clean_choice_text}"
             choice_options.append(choice_display)
             choice_mapping[choice_display] = choice
@@ -491,9 +509,11 @@ def display_question_detail():
                     correct_choice = choice
                     break
             
-            # Get clean text for comparison
-            correct_clean_text = BeautifulSoup(correct_choice.text, 'html.parser').get_text(strip=True)
-            selected_clean_text = BeautifulSoup(st.session_state.selected_answer.text, 'html.parser').get_text(strip=True)
+            # Get clean text for comparison using robust cleaning
+            correct_cleaned_text = clean_html_content(correct_choice.text)
+            correct_clean_text = BeautifulSoup(correct_cleaned_text, 'html.parser').get_text(strip=True)
+            selected_cleaned_text = clean_html_content(st.session_state.selected_answer.text)
+            selected_clean_text = BeautifulSoup(selected_cleaned_text, 'html.parser').get_text(strip=True)
             
             # Determine if user was correct
             user_correct = st.session_state.selected_answer.is_correct

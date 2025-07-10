@@ -170,8 +170,65 @@ class UpdatedLegacyAdapter:
     
     def get_question_by_id(self, question_id: str) -> Optional[Question]:
         """Get a single question by ID"""
-        questions = self.find_questions({"_id": question_id})
-        return questions[0] if questions else None
+        try:
+            # Query directly by _id without going through find_questions
+            from bson import ObjectId
+            
+            # Try to convert to ObjectId if it's a valid ObjectId string
+            try:
+                query = {"_id": ObjectId(question_id)}
+            except:
+                # If not a valid ObjectId, use as string
+                query = {"_id": question_id}
+            
+            raw_docs = db_client.find_documents(config.QUESTIONS_COLLECTION, query)
+            
+            if not raw_docs:
+                return None
+            
+            doc = raw_docs[0]
+            
+            # Parse choices from the legacy format
+            choices = []
+            if "choices" in doc and doc["choices"]:
+                for i, choice_data in enumerate(doc["choices"], 1):
+                    if isinstance(choice_data, dict):
+                        choice_text = choice_data.get('text', '')
+                        choice_id = choice_data.get('id', i)
+                        is_correct = choice_data.get('is_correct', False)
+                        choices.append(Choice(text=choice_text, id=choice_id, is_correct=is_correct))
+                    elif isinstance(choice_data, str):
+                        choices.append(Choice(text=choice_data, id=i, is_correct=(i == 1)))
+                    else:
+                        continue
+            
+            # Parse images
+            images = ImageSet()
+            if "images" in doc and isinstance(doc["images"], dict):
+                images.question = doc["images"].get("question", [])
+                images.explanation = doc["images"].get("explanation", [])
+            
+            # Create Question object with proper field mapping
+            question_data = {
+                "_id": doc["_id"],
+                "name": doc.get("name", ""),
+                "source": doc.get("source", ""),
+                "tags": doc.get("tags", []),
+                "images": images,
+                "question": doc.get("question", ""),
+                "explanation": doc.get("explanation", ""),
+                "choices": choices,
+                "flagged": doc.get("flagged", False),
+                "difficult": doc.get("difficult", False),
+                "is_favorite": doc.get("flagged", False),
+                "notes": doc.get("notes", "")
+            }
+            
+            return Question.model_validate(question_data)
+            
+        except Exception as e:
+            print(f"Error getting question by ID {question_id}: {e}")
+            return None
     
     def update_question_field(self, question_id: str, field: str, value: Any) -> bool:
         """Update a question field with proper field mapping"""
