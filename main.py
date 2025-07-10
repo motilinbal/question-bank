@@ -97,6 +97,12 @@ if "submitted" not in st.session_state:
 if "show_explanation" not in st.session_state:
     st.session_state.show_explanation = False  # Controls explanation visibility
 
+# --- Question Caching for Performance ---
+if "current_question" not in st.session_state:
+    st.session_state.current_question = None  # Will hold the full question object
+if "current_question_id" not in st.session_state:
+    st.session_state.current_question_id = None  # Tracks the ID of the question being displayed
+
 # --- Sidebar for Filters ---
 with st.sidebar:
     st.title("🔍 Search & Filters")
@@ -425,20 +431,27 @@ def display_question_detail():
     load_custom_css()
     
     q_id = st.session_state.selected_question_id
-    # Use CACHED function for instant performance
-    question = get_cached_question(q_id)
-
-    if not question:
-        st.error("Question not found!")
-        st.session_state.selected_question_id = None
-        return
-
-    # Reset state when switching questions
-    if f"current_q_{q_id}" not in st.session_state:
+    
+    # Core Caching Logic: Fetch from DB only if the selected question has changed
+    if st.session_state.current_question_id != q_id:
+        # It's a new question, so we fetch it from the database
+        question = get_cached_question(q_id)
+        if not question:
+            st.error("Question not found!")
+            st.session_state.selected_question_id = None
+            return
+        
+        # Store the newly fetched question and its ID in the session state
+        st.session_state.current_question = question
+        st.session_state.current_question_id = q_id
+        
+        # Reset submission state for the new question
         st.session_state.submitted = False
         st.session_state.selected_answer = None
         st.session_state.show_explanation = False
-        st.session_state[f"current_q_{q_id}"] = True
+    else:
+        # It's the same question, just use the cached version (INSTANT!)
+        question = st.session_state.current_question
 
     # --- Font Size Controls (now instant due to caching) ---
     col1, col2 = st.columns([10, 1])
