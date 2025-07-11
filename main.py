@@ -453,16 +453,20 @@ def display_question_detail():
     
 
     # --- DEBUGGING STEP 2: TEST STATIC ASSET SERVING ---
-    st.subheader("--- DEBUGGER 2.0 ---")
+    # --- DEBUGGING STEP 3: TEST OFFICIAL STATIC DIRECTORY ---
+    st.subheader("--- DEBUGGER 3.0 ---")
 
-    # Using a real image filename from our assets/images/ folder
-    test_image_path = "assets/images/21-10-23 18.59.15.jpg"
+    # This filename MUST match the file you copied into the 'static' folder.
+    test_image_in_static = "21-10-23 20.54.30.jpg"
 
-    st.write("Testing asset display with `st.image`:")
-    try:
-        st.image(test_image_path, caption=f"Attempting to load: {test_image_path}")
-    except Exception as e:
-        st.error(f"Failed to load image with st.image: {e}")
+    st.write("Testing a direct link to a file in the `/static` directory:")
+
+    # We are creating a simple, clean <a> tag.
+    # The href is a simple root path, which Streamlit should serve from the static folder.
+    st.markdown(
+        f'<a href="{test_image_in_static}" target="_blank">Click to test static image link</a>',
+        unsafe_allow_html=True
+    )
 
     st.subheader("--- END DEBUGGER ---")
     # --- END OF DEBUGGING CODE ---
