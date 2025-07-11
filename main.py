@@ -450,15 +450,15 @@ def display_question_detail():
         st.session_state.selected_question_id = None
         return
 
-    # --- Font Size Controls (Fixed Layout) ---
-    col1, col2, col3 = st.columns([1, 1, 8])
-    with col1:
-        if st.button("+", help="Increase font size", key="font_plus"):
-            st.session_state.font_size = min(st.session_state.font_size + 2, 28)
-            st.rerun()
-    with col2:
-        if st.button("-", help="Decrease font size", key="font_minus"):
+    # --- Font Size Controls (Stable Layout) ---
+    spacer, minus_col, plus_col = st.columns([0.85, 0.075, 0.075]) # Use a spacer to push buttons right
+    with minus_col:
+        if st.button("➖", help="Decrease font size", use_container_width=True):
             st.session_state.font_size = max(st.session_state.font_size - 2, 12)
+            st.rerun()
+    with plus_col:
+        if st.button("➕", help="Increase font size", use_container_width=True):
+            st.session_state.font_size = min(st.session_state.font_size + 2, 28)
             st.rerun()
 
     # --- Display Question Header ---
