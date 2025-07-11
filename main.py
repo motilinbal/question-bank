@@ -5,6 +5,7 @@ from question_service import question_service
 from models import AssetType
 from bs4 import BeautifulSoup
 import re
+import textwrap
 
 # --- Initial Page Config ---
 st.set_page_config(
@@ -446,16 +447,13 @@ def display_pagination_controls(total_pages, position="top"):
 
 def display_question_detail():
     """
-    Displays an interactive question with a sleek dark theme, instant performance,
-    and correct rendering of all assets.
+    Displays an interactive question, correctly rendering all assets and maintaining UI reactivity.
     """
-    # Load custom CSS
     load_custom_css()
     
     q_id = st.session_state.selected_question_id
-    
-    # Use the cached, fully processed question object from our service
     question = get_cached_question(q_id)
+
     if not question:
         st.error("Question not found!")
         st.session_state.selected_question_id = None
@@ -468,27 +466,28 @@ def display_question_detail():
         with font_col1:
             if st.button("➕", help="Increase font size", key="font_plus"):
                 st.session_state.font_size = min(st.session_state.font_size + 2, 28)
-                st.rerun() # Add this line back
+                st.rerun()
         with font_col2:
             if st.button("➖", help="Decrease font size", key="font_minus"):
                 st.session_state.font_size = max(st.session_state.font_size - 2, 12)
-                st.rerun() # Add this line back
+                st.rerun()
 
     # --- Display Question Header ---
     st.subheader(f"Question: {question.name}")
     st.caption(f"Source: {question.source} | Tags: {', '.join(question.tags)}")
     st.divider()
 
-    # --- Render Question Body using st.html ---
-    st.html(f"""
+    # --- Render Question Body using DEDENTED markdown ---
+    question_html = textwrap.dedent(f"""
         <div class="question-container">
             <div class="question-text" style="font-size: {st.session_state.font_size}px;">
                 {question.processed_question_html}
             </div>
         </div>
     """)
+    st.markdown(question_html, unsafe_allow_html=True)
 
-    # --- Render Primary Assets for the Question ---
+    # --- Render Primary Assets ---
     if question.primary_question_assets:
         st.write("**Question Media:**")
         for asset in question.primary_question_assets:
@@ -497,40 +496,59 @@ def display_question_detail():
             elif asset.asset_type == AssetType.AUDIO:
                 st.audio(asset.file_path)
 
-    # --- Interactive Choices Section ---
+
+    # --- Interactive Choices with Direct CSS Styling ---
     if question.choices:
         if not st.session_state.get('submitted', False):
-            # BEFORE SUBMISSION: Render choices as radio buttons
+            # Before submission: Use radio buttons for selection
             choice_options = []
             choice_mapping = {}
-            for choice in question.choices:
+            for i, choice in enumerate(question.choices):
                 # Use BeautifulSoup to safely get text from choice HTML
-                clean_text = BeautifulSoup(choice.text, 'html.parser').get_text(strip=True)
-                display_text = f"{choice.id}. {clean_text}"
-                choice_options.append(display_text)
-                choice_mapping[display_text] = choice
+                clean_choice_text = BeautifulSoup(choice.text, 'html.parser').get_text(strip=True)
+                choice_display = f"{choice.id}. {clean_choice_text}"
+                choice_options.append(choice_display)
+                choice_mapping[choice_display] = choice
             
-            selected_choice_display = st.radio(
-                "Choices", options=choice_options, key=f"choices_{q_id}", label_visibility="collapsed"
+            # Radio button for choice selection
+            selected_choice_text = st.radio(
+                "Choices",
+                options=choice_options,
+                key=f"choices_{q_id}",
+                label_visibility="collapsed"
             )
             
-            if selected_choice_display:
-                st.session_state.selected_answer = choice_mapping[selected_choice_display]
+            if selected_choice_text:
+                st.session_state.selected_answer = choice_mapping[selected_choice_text]
         else:
-            # AFTER SUBMISSION: Render choices as styled divs
+            # After submission: Show choices with color-coded borders
             for choice in question.choices:
-                clean_text = BeautifulSoup(choice.text, 'html.parser').get_text(strip=True)
+                clean_choice_text = BeautifulSoup(choice.text, 'html.parser').get_text(strip=True)
                 
-                border_color, border_width = "#ccc", "1px" # Default style
+                # Determine border color and style
+                border_color = "#ccc"  # Default gray
+                border_width = "1px"
+                
                 if choice.is_correct:
-                    border_color, border_width = "#28a745", "2px" # Correct
-                elif st.session_state.selected_answer and choice.id == st.session_state.selected_answer.id:
-                    border_color, border_width = "#dc3545", "2px" # Incorrectly chosen
+                    # Correct answer gets green border
+                    border_color = "#28a745"
+                    border_width = "2px"
+                elif st.session_state.selected_answer and choice.id == st.session_state.selected_answer.id and not choice.is_correct:
+                    # User's incorrect choice gets red border
+                    border_color = "#dc3545"
+                    border_width = "2px"
                 
+                # Display choice with appropriate styling using st.html
                 st.html(f"""
-                    <div style="border: {border_width} solid {border_color}; border-radius: 10px; padding: 1rem 1.5rem; margin: 0.5rem 0;">
-                        {choice.id}. {clean_text}
-                    </div>
+                <div style="
+                    border: {border_width} solid {border_color};
+                    border-radius: 10px;
+                    padding: 1rem 1.5rem;
+                    margin: 0.5rem 0;
+                    color: #FAFAFA;
+                ">
+                    {choice.id}. {clean_choice_text}
+                </div>
                 """)
 
         # --- Submit Button ---
@@ -541,11 +559,12 @@ def display_question_detail():
                     st.session_state.submitted = True
                     st.session_state.show_explanation = True
                     st.rerun()
-
+    
     # --- Explanation Section ---
-    if st.session_state.get('show_explanation', False) and question.processed_explanation_html:
+    if st.session_state.get('show_explanation', False):
         st.markdown("---")
-        st.html(f"""
+        # --- Render Explanation Body using DEDENTED markdown ---
+        explanation_html = textwrap.dedent(f"""
             <div class="explanation-container">
                 <div class="explanation-title">💡 Explanation</div>
                 <div class="explanation-content" style="font-size: {st.session_state.font_size - 2}px;">
@@ -553,8 +572,9 @@ def display_question_detail():
                 </div>
             </div>
         """)
+        st.markdown(explanation_html, unsafe_allow_html=True)
 
-        # --- Render Primary Assets for the Explanation ---
+        # --- Render Primary Explanation Assets ---
         if question.primary_explanation_assets:
             st.write("**Explanation Media:**")
             for asset in question.primary_explanation_assets:
@@ -562,7 +582,6 @@ def display_question_detail():
                     st.image(asset.file_path, caption=asset.name)
                 elif asset.asset_type == AssetType.AUDIO:
                     st.audio(asset.file_path)
-
 
 # --- Main Application Router ---
 if st.session_state.selected_question_id is None:

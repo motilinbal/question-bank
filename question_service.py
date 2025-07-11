@@ -2,8 +2,6 @@
 
 import streamlit as st
 import re
-import base64
-import mimetypes
 from typing import Union
 from database import db_client
 import database_helpers as db_helpers
@@ -93,8 +91,8 @@ class QuestionService:
 
     def _hydrate_html(self, html: str) -> str:
         """
-        Finds all placeholder <a> tags and replaces them with a clean, functional link.
-        This final version embeds file assets as Base64 data URIs for robust serving.
+        Finds all placeholder <a> tags and replaces them with a clean, functional link
+        pointing to the correct asset path.
         """
         if not html:
             return ""
@@ -110,29 +108,19 @@ class QuestionService:
 
             asset_type = db_helpers.get_asset_type_from_db(asset_id)
 
-            # Handle Database-Hosted Content (Pages and Tables)
+            # Handle Pages and Tables
             if asset_type in [AssetType.PAGE, AssetType.TABLE]:
-                # This link is meant to be handled by a potential future routing/modal system
-                # For now, we link to a placeholder viewer path
+                # This path is a placeholder for a future routing system
                 return f'<a href="/viewer/{asset_type.value}/{asset_id}" target="_blank">{original_text}</a>'
 
-            # Handle File-Based Media (Images, Audio, Videos)
+            # Handle File-Based Media
             elif asset_type in [AssetType.IMAGE, AssetType.AUDIO, AssetType.VIDEO]:
                 collection_name = f"{asset_type.value.capitalize()}s"
                 doc = db_helpers.get_asset_document_by_id(asset_id, collection_name)
                 if doc:
+                    # Generate a simple, direct link to the static asset
                     file_path = f"assets/{asset_type.value}s/{doc.get('name', '')}"
-                    try:
-                        # Read the file and encode it
-                        with open(file_path, "rb") as f:
-                            data = f.read()
-                        base64_data = base64.b64encode(data).decode('utf-8')
-                        # Get the correct MIME type
-                        mime_type = mimetypes.guess_type(file_path)[0] or "application/octet-stream"
-                        
-                        return f'<a href="data:{mime_type};base64,{base64_data}" download="{doc.get("name", "")}">{original_text}</a>'
-                    except FileNotFoundError:
-                        return f'[Asset File Not Found: {file_path}]'
+                    return f'<a href="{file_path}" target="_blank">{original_text}</a>'
 
             return f'[Asset Not Found: {asset_id}]'
 
