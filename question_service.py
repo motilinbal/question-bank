@@ -89,42 +89,67 @@ class QuestionService:
 
         return question_model
 
-    def _hydrate_html(self, html: str) -> str:
+    def _hydrate_html(self, question: Question):
         """
-        Finds all placeholder <a> tags and replaces them with a clean, functional link
-        pointing to the correct asset path.
+        Parses the raw HTML to find asset placeholders.
+        1. Replaces the original <a> tag in the HTML with just its text.
+        2. Populates a structured list of 'inline_assets' in the Question object.
         """
+        # Process question HTML
+        if not question.raw_question_html:
+            question.processed_question_html = ""
+        else:
+            question.processed_question_html = self._process_html_content(question.raw_question_html, question)
+
+        # Process explanation HTML
+        if not question.raw_explanation_html:
+            question.processed_explanation_html = ""
+        else:
+            question.processed_explanation_html = self._process_html_content(question.raw_explanation_html, question)
+
+    def _process_html_content(self, html: str, question: Question) -> str:
+        """Helper method to process HTML content and collect inline assets."""
         if not html:
             return ""
 
-        placeholder_pattern = re.compile(
-            r'<a[^>]*href="\[\[(.*?)\]\]"[^>]*>(.*?)</a>',
-            re.DOTALL
-        )
-
-        def replace_placeholder(match):
+        # This regex finds the <a> tags and captures the asset ID and the link text
+        placeholder_pattern = re.compile(r'<a[^>]*href="\[\[(.*?)\]\]"[^>]*>(.*?)</a>', re.DOTALL)
+        
+        # Use a function to perform the replacement and populate the inline_assets list
+        def replace_and_collect(match):
             asset_id = match.group(1)
             original_text = match.group(2).strip()
-
             asset_type = db_helpers.get_asset_type_from_db(asset_id)
-
-            # Handle Pages and Tables
-            if asset_type in [AssetType.PAGE, AssetType.TABLE]:
-                # This path is a placeholder for a future routing system
-                return f'<a href="/viewer/{asset_type.value}/{asset_id}" target="_blank">{original_text}</a>'
-
-            # Handle File-Based Media
-            elif asset_type in [AssetType.IMAGE, AssetType.AUDIO, AssetType.VIDEO]:
+            
+            # Create the appropriate asset object and add it to our list
+            if asset_type in [AssetType.IMAGE, AssetType.AUDIO, AssetType.VIDEO]:
                 collection_name = f"{asset_type.value.capitalize()}s"
                 doc = db_helpers.get_asset_document_by_id(asset_id, collection_name)
                 if doc:
-                    # Generate a simple, direct link to the static asset
-                    file_path = f"assets/{asset_type.value}s/{doc.get('name', '')}"
-                    return f'<a href="{file_path}" target="_blank">{original_text}</a>'
+                    asset = FileAsset(
+                        uuid=asset_id,
+                        name=doc.get("name", ""),
+                        asset_type=asset_type,
+                        file_path=f"assets/{asset_type.value}s/{doc.get('name', '')}",
+                        link_text=original_text  # Store the original link text
+                    )
+                    question.inline_assets.append(asset)
+            
+            elif asset_type in [AssetType.PAGE, AssetType.TABLE]:
+                html_content = db_helpers.get_content_asset_html(asset_id, asset_type)
+                if html_content:
+                    asset = ContentAsset(
+                        uuid=asset_id,
+                        name=original_text,
+                        asset_type=asset_type,
+                        html_content=html_content,
+                        link_text=original_text
+                    )
+                    question.inline_assets.append(asset)
 
-            return f'[Asset Not Found: {asset_id}]'
+            return original_text  # Return just the text to replace the <a> tag
 
-        return placeholder_pattern.sub(replace_placeholder, html)
+        return placeholder_pattern.sub(replace_and_collect, html)
 
     def get_question(self, question_id: str) -> Question | None:
         """
@@ -134,9 +159,8 @@ class QuestionService:
         if not question:
             return None
         
-        # Hydrate the HTML
-        question.processed_question_html = self._hydrate_html(question.raw_question_html)
-        question.processed_explanation_html = self._hydrate_html(question.raw_explanation_html)
+        # Hydrate the HTML (this now modifies the question object in-place)
+        self._hydrate_html(question)
         
         return question
 

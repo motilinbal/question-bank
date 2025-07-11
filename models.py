@@ -23,11 +23,13 @@ class FileAsset(BaseAsset):
     """Represents an asset that corresponds to a physical file on the server."""
     name: str
     file_path: str
+    link_text: str = ""
 
 class ContentAsset(BaseAsset):
     """Represents an asset whose content is stored directly as HTML in the database."""
     name: str
     html_content: str
+    link_text: str = ""
 
 class LinkAsset(BaseModel):
     """Represents a simple external hyperlink."""
@@ -71,8 +73,8 @@ class Question(BaseModel):
     primary_question_assets: list[FileAsset] = []
     primary_explanation_assets: list[FileAsset] = []
     
-    # We will populate this list in a later phase
-    # inline_assets: list[Union[FileAsset, ContentAsset, LinkAsset]] = []
+    # List of inline assets found in the HTML content
+    inline_assets: list[Union[FileAsset, ContentAsset, LinkAsset]] = []
 
 
 # MediaItem and Source models remain the same as they describe our *target* schema

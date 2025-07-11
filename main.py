@@ -20,37 +20,6 @@ def get_cached_question(question_id):
     """Retrieves and caches the fully processed question object."""
     return question_service.get_question(question_id)
 
-# def clean_html_content(html_string):
-#     """Clean HTML content to remove artifacts and malformed tags"""
-#     if not html_string:
-#         return ""
-    
-#     # Remove the specific artifacts mentioned - handle various patterns
-#     cleaned = html_string
-    
-#     # Remove </div></div> as single string
-#     cleaned = cleaned.replace("</div></div>", "")
-    
-#     # Remove line-separated </div> artifacts with various whitespace patterns
-#     cleaned = re.sub(r'</div>\s*\n\s*</div>', '', cleaned)
-#     cleaned = re.sub(r'</div>\s*</div>', '', cleaned)
-    
-#     # Remove trailing orphaned </div> tags
-#     cleaned = re.sub(r'</div>\s*$', '', cleaned.strip())
-    
-#     # Remove multiple consecutive </div> tags
-#     cleaned = re.sub(r'(</div>\s*){2,}', '', cleaned)
-    
-#     # Remove <p> tags using regex for thorough cleaning
-#     cleaned = re.sub(r'</?p[^>]*>', '', cleaned)
-    
-#     # Clean up extra whitespace that might be left behind
-#     cleaned = re.sub(r'\n\s*\n', '\n', cleaned)
-#     cleaned = cleaned.strip()
-    
-#     return cleaned
-
-
 # --- Helper Functions ---
 @st.cache_data  # Cache the data so we don't query on every rerun
 def get_filter_options():
@@ -112,12 +81,12 @@ with st.sidebar:
     selected_tags = st.multiselect("Filter by Tags", options=all_tags)
     st.markdown("---")
     show_favorites_only = st.checkbox("Show Favorites Only ⭐")
-    show_marked_only = st.checkbox("Show Marked Only 🚩")
+    show_marked_only = st.checkbox("Show Marked Only 🔖")
 
     # --- Actions Section (only show when viewing a question) ---
     if st.session_state.selected_question_id is not None:
         st.markdown("---")
-        st.subheader("⚡ Actions")
+        st.subheader("⚙️ Actions")
         
         # Get current question for button states
         question = question_service.get_question(st.session_state.selected_question_id)
@@ -294,7 +263,7 @@ def load_custom_css():
 
 # --- Main Content Area (Remove title when viewing question) ---
 if st.session_state.selected_question_id is None:
-    st.title("🩺 DocuMedica Question Bank")
+    st.title("🏥 DocuMedica Question Bank")
 
 
 def display_question_list():
@@ -397,7 +366,7 @@ def display_question_list():
             col1, col2 = st.columns([4, 1])
             with col1:
                 fav_icon = "⭐" if q.is_favorite else ""
-                mark_icon = "🚩" if q.difficult else ""
+                mark_icon = "🔖" if q.difficult else ""
                 st.markdown(f"**{q.question_id}** {fav_icon} {mark_icon}")
                 st.caption(f"Source: {q.source} | Tags: {', '.join(q.tags)}")
             with col2:
@@ -443,33 +412,36 @@ def display_pagination_controls(total_pages, position="top"):
             st.rerun()
 
 
-# In main.py, replace the entire old function with this new one:
+def display_inline_assets(question):
+    """Display inline assets using Streamlit native components"""
+    if not question.inline_assets:
+        return
+    
+    st.write("**Referenced Content:**")
+    
+    for asset in question.inline_assets:
+        if asset.asset_type in [AssetType.IMAGE, AssetType.AUDIO, AssetType.VIDEO]:
+            # File-based assets - display directly
+            with st.expander(f"📎 {asset.link_text}", expanded=False):
+                if asset.asset_type == AssetType.IMAGE:
+                    st.image(asset.file_path, caption=asset.name)
+                elif asset.asset_type == AssetType.AUDIO:
+                    st.audio(asset.file_path)
+                elif asset.asset_type == AssetType.VIDEO:
+                    st.video(asset.file_path)
+        
+        elif asset.asset_type in [AssetType.PAGE, AssetType.TABLE]:
+            # Content-based assets - display HTML content
+            with st.expander(f"📄 {asset.link_text}", expanded=False):
+                st.markdown(asset.html_content, unsafe_allow_html=True)
+
 
 def display_question_detail():
     """
-    Displays an interactive question, correctly rendering all assets and maintaining UI reactivity.
+    Displays an interactive question using Streamlit-native components for all assets.
     """
     load_custom_css()
     
-
-    # --- DEBUGGING STEP 2: TEST STATIC ASSET SERVING ---
-    # --- DEBUGGING STEP 3: TEST OFFICIAL STATIC DIRECTORY ---
-    st.subheader("--- DEBUGGER 3.0 ---")
-
-    # This filename MUST match the file you copied into the 'static' folder.
-    test_image_in_static = "21-10-23 20.54.30.jpg"
-
-    st.write("Testing a direct link to a file in the `/static` directory:")
-
-    # We are creating a simple, clean <a> tag.
-    # The href is a simple root path, which Streamlit should serve from the static folder.
-    st.markdown(
-        f'<a href="{test_image_in_static}" target="_blank">Click to test static image link</a>',
-        unsafe_allow_html=True
-    )
-
-    st.subheader("--- END DEBUGGER ---")
-    # --- END OF DEBUGGING CODE ---
     q_id = st.session_state.selected_question_id
     question = get_cached_question(q_id)
 
@@ -478,14 +450,16 @@ def display_question_detail():
         st.session_state.selected_question_id = None
         return
 
-    # --- Font Size Controls (DEBUGGING) ---
-    if st.button("➕", help="Increase font size", key="font_plus"):
-        st.session_state.font_size = min(st.session_state.font_size + 2, 28)
-        st.rerun()
-
-    if st.button("➖", help="Decrease font size", key="font_minus"):
-        st.session_state.font_size = max(st.session_state.font_size - 2, 12)
-        st.rerun()
+    # --- Font Size Controls (Fixed Layout) ---
+    col1, col2, col3 = st.columns([1, 1, 8])
+    with col1:
+        if st.button("+", help="Increase font size", key="font_plus"):
+            st.session_state.font_size = min(st.session_state.font_size + 2, 28)
+            st.rerun()
+    with col2:
+        if st.button("-", help="Decrease font size", key="font_minus"):
+            st.session_state.font_size = max(st.session_state.font_size - 2, 12)
+            st.rerun()
 
     # --- Display Question Header ---
     st.subheader(f"Question: {question.name}")
@@ -511,6 +485,8 @@ def display_question_detail():
             elif asset.asset_type == AssetType.AUDIO:
                 st.audio(asset.file_path)
 
+    # --- Display Inline Assets using Streamlit Components ---
+    display_inline_assets(question)
 
     # --- Interactive Choices with Direct CSS Styling ---
     if question.choices:
