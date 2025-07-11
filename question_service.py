@@ -91,40 +91,30 @@ class QuestionService:
 
     def _hydrate_html(self, html: str) -> str:
         """
-        Parses HTML content to find all [[...]] placeholders and replaces them
-        with the appropriate links or content.
+        Finds all placeholder <a> tags with href="[[...]]" and replaces them
+        with a clean, functional link.
         """
         if not html:
             return ""
 
-        # Regex to find all occurrences of [[...]]
-        placeholder_pattern = re.compile(r"\[\[(.*?)\]\]")
-        
-        # Using a function for the replacement logic
-        def replace_placeholder(match):
-            content = match.group(1)
+        # FINAL, CORRECT REGEX:
+        # This specifically finds <a> tags where the href is a [[...]] placeholder.
+        # It captures the UUID inside the brackets.
+        # re.DOTALL flag makes . match newlines too
+        placeholder_pattern = re.compile(r'<a[^>]*href="\[\[(.*?)\]\]"[^>]*>.*?</a>', re.DOTALL)
 
-            # Check if it's an external URL
-            if content.startswith("http"):
-                return f'<a href="{content}" target="_blank" rel="noopener noreferrer">{content}</a>'
-            
+        def replace_placeholder(match):
+            # The UUID is in the first (and only) capture group.
+            asset_id = match.group(1)
+
             # It's an internal UUID, find its type
-            asset_id = content
             asset_type = db_helpers.get_asset_type_from_db(asset_id)
 
-            if asset_type in [AssetType.PAGE, AssetType.TABLE]:
+            if asset_type in [AssetType.PAGE, AssetType.TABLE, AssetType.IMAGE, AssetType.VIDEO, AssetType.AUDIO]:
                 # For Pages and Tables, create a link that can trigger a modal in the UI
-                # The href points to the asset type and ID for the UI to handle
-                return f'<a href="/viewer/{asset_type.value}/{asset_id}" target="_blank">{asset_type.value.capitalize()}</a>'
-            
-            if asset_type in [AssetType.IMAGE, AssetType.VIDEO, AssetType.AUDIO]:
-                # For file assets, create a direct link to the file
-                doc = db_helpers.get_asset_document_by_id(asset_id, f"{asset_type.value.capitalize()}s")
-                if doc:
-                    file_path = f"assets/{asset_type.value}s/{doc.get('name', '')}"
-                    return f'<a href="{file_path}" target="_blank">View {asset_type.value.capitalize()}</a>'
-            
-            # If the asset is not found or type is unknown, return a placeholder
+                return f'<a href="/viewer/{asset_type.value}/{asset_id}" target="_blank">View {asset_type.value.capitalize()}</a>'
+
+            # If the asset is not found, return an error message.
             return f'[Asset Not Found: {asset_id}]'
 
         return placeholder_pattern.sub(replace_placeholder, html)
