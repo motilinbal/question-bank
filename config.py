@@ -11,11 +11,18 @@ DB_NAME = os.getenv("DB_NAME", "documedica_refactored")
 
 # --- Collection Names ---
 QUESTIONS_COLLECTION = "Questions"
-MEDIA_COLLECTION = "Images"  # We'll need to check your data structure
-SOURCES_COLLECTION = "sources"  # This might need to be created
+IMAGES_COLLECTION = "Images"
+AUDIO_COLLECTION = "Audio"
+VIDEOS_COLLECTION = "Videos"
+SOURCES_COLLECTION = "sources" # This might not be needed
 
 # --- Asset Paths ---
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets")
 IMAGES_DIR = os.path.join(ASSETS_DIR, "images")
 VIDEOS_DIR = os.path.join(ASSETS_DIR, "videos")
 AUDIO_DIR = os.path.join(ASSETS_DIR, "audio")
+
+# IMAGES_DIR = '/home/motilin/Documents/Medical/Docs/Mongo_Banks/Media_test/Images'
+# AUDIO_DIR = '/home/motilin/Documents/Medical/Docs/Mongo_Banks/Media_test/Audio'
+# VIDEO_DIR = '/home/motilin/Documents/Medical/Docs/Mongo_Banks/Media_test/Videos'
+
