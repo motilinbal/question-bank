@@ -1,7 +1,6 @@
 import streamlit as st
 from database import db_client
 import config
-from updated_legacy_adapter import updated_legacy_adapter
 from question_service import question_service
 from models import AssetType
 from bs4 import BeautifulSoup
