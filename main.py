@@ -468,9 +468,11 @@ def display_question_detail():
         with font_col1:
             if st.button("➕", help="Increase font size", key="font_plus"):
                 st.session_state.font_size = min(st.session_state.font_size + 2, 28)
+                st.rerun() # Add this line back
         with font_col2:
             if st.button("➖", help="Decrease font size", key="font_minus"):
                 st.session_state.font_size = max(st.session_state.font_size - 2, 12)
+                st.rerun() # Add this line back
 
     # --- Display Question Header ---
     st.subheader(f"Question: {question.name}")
