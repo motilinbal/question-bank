@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 from database import db_client
 import config
 from question_service import question_service
@@ -64,6 +65,8 @@ if "submitted" not in st.session_state:
     st.session_state.submitted = False  # Tracks if the user has submitted their answer
 if "show_explanation" not in st.session_state:
     st.session_state.show_explanation = False  # Controls explanation visibility
+if "asset_to_show" not in st.session_state:
+    st.session_state.asset_to_show = None
 
 # --- Question Caching for Performance ---
 if "current_question" not in st.session_state:
@@ -412,34 +415,10 @@ def display_pagination_controls(total_pages, position="top"):
             st.rerun()
 
 
-def display_inline_assets(question):
-    """Display inline assets using Streamlit native components"""
-    if not question.inline_assets:
-        return
-    
-    st.write("**Referenced Content:**")
-    
-    for asset in question.inline_assets:
-        if asset.asset_type in [AssetType.IMAGE, AssetType.AUDIO, AssetType.VIDEO]:
-            # File-based assets - display directly
-            with st.expander(f"📎 {asset.link_text}", expanded=False):
-                if asset.asset_type == AssetType.IMAGE:
-                    st.image(asset.file_path, caption=asset.name)
-                elif asset.asset_type == AssetType.AUDIO:
-                    st.audio(asset.file_path)
-                elif asset.asset_type == AssetType.VIDEO:
-                    st.video(asset.file_path)
-        
-        elif asset.asset_type in [AssetType.PAGE, AssetType.TABLE]:
-            # Content-based assets - display HTML content
-            with st.expander(f"📄 {asset.link_text}", expanded=False):
-                st.markdown(asset.html_content, unsafe_allow_html=True)
+
 
 
 def display_question_detail():
-    """
-    Displays an interactive question using Streamlit-native components for all assets.
-    """
     load_custom_css()
     
     q_id = st.session_state.selected_question_id
@@ -450,8 +429,8 @@ def display_question_detail():
         st.session_state.selected_question_id = None
         return
 
-    # --- Font Size Controls (Stable Layout) ---
-    spacer, minus_col, plus_col = st.columns([0.85, 0.075, 0.075]) # Use a spacer to push buttons right
+    # --- Font Size Controls ---
+    _, minus_col, plus_col = st.columns([0.85, 0.075, 0.075])
     with minus_col:
         if st.button("➖", help="Decrease font size", use_container_width=True):
             st.session_state.font_size = max(st.session_state.font_size - 2, 12)
@@ -466,81 +445,47 @@ def display_question_detail():
     st.caption(f"Source: {question.source} | Tags: {', '.join(question.tags)}")
     st.divider()
 
-    # --- Render Question Body using DEDENTED markdown ---
-    question_html = textwrap.dedent(f"""
-        <div class="question-container">
-            <div class="question-text" style="font-size: {st.session_state.font_size}px;">
-                {question.processed_question_html}
-            </div>
-        </div>
-    """)
-    st.markdown(question_html, unsafe_allow_html=True)
-
-    # --- Render Primary Assets ---
+    # --- RENDER THE QUESTION BODY ---
+    st.markdown(f"<div style='font-size: {st.session_state.font_size}px;'>{question.processed_question_html}</div>", unsafe_allow_html=True)
     if question.primary_question_assets:
-        st.write("**Question Media:**")
+        st.write("**Associated Media:**")
         for asset in question.primary_question_assets:
             if asset.asset_type == AssetType.IMAGE:
                 st.image(asset.file_path, caption=asset.name)
             elif asset.asset_type == AssetType.AUDIO:
                 st.audio(asset.file_path)
 
-    # --- Display Inline Assets using Streamlit Components ---
-    display_inline_assets(question)
-
-    # --- Interactive Choices with Direct CSS Styling ---
+    # --- INTERACTIVE CHOICES UI ---
     if question.choices:
         if not st.session_state.get('submitted', False):
-            # Before submission: Use radio buttons for selection
             choice_options = []
             choice_mapping = {}
             for i, choice in enumerate(question.choices):
-                # Use BeautifulSoup to safely get text from choice HTML
                 clean_choice_text = BeautifulSoup(choice.text, 'html.parser').get_text(strip=True)
                 choice_display = f"{choice.id}. {clean_choice_text}"
                 choice_options.append(choice_display)
                 choice_mapping[choice_display] = choice
             
-            # Radio button for choice selection
             selected_choice_text = st.radio(
-                "Choices",
-                options=choice_options,
-                key=f"choices_{q_id}",
-                label_visibility="collapsed"
+                "Choices", options=choice_options, key=f"choices_{q_id}", label_visibility="collapsed"
             )
             
             if selected_choice_text:
                 st.session_state.selected_answer = choice_mapping[selected_choice_text]
         else:
-            # After submission: Show choices with color-coded borders
             for choice in question.choices:
                 clean_choice_text = BeautifulSoup(choice.text, 'html.parser').get_text(strip=True)
-                
-                # Determine border color and style
-                border_color = "#ccc"  # Default gray
-                border_width = "1px"
-                
+                border_color, border_width = "#ccc", "1px"
                 if choice.is_correct:
-                    # Correct answer gets green border
-                    border_color = "#28a745"
-                    border_width = "2px"
-                elif st.session_state.selected_answer and choice.id == st.session_state.selected_answer.id and not choice.is_correct:
-                    # User's incorrect choice gets red border
-                    border_color = "#dc3545"
-                    border_width = "2px"
+                    border_color, border_width = "#28a745", "2px"
+                elif st.session_state.selected_answer and choice.id == st.session_state.selected_answer.id:
+                    border_color, border_width = "#dc3545", "2px"
                 
-                # Display choice with appropriate styling using st.html
-                st.html(f"""
-                <div style="
-                    border: {border_width} solid {border_color};
-                    border-radius: 10px;
-                    padding: 1rem 1.5rem;
-                    margin: 0.5rem 0;
-                    color: #FAFAFA;
-                ">
+                st.markdown(f"""
+                <div style=\"border: {border_width} solid {border_color}; border-radius: 10px; padding: 1rem 1.5rem; margin: 0.5rem 0;\">
                     {choice.id}. {clean_choice_text}
                 </div>
-                """)
+                """, unsafe_allow_html=True)
 
         # --- Submit Button ---
         if not st.session_state.get('submitted', False) and st.session_state.get('selected_answer'):
@@ -550,29 +495,53 @@ def display_question_detail():
                     st.session_state.submitted = True
                     st.session_state.show_explanation = True
                     st.rerun()
-    
-    # --- Explanation Section ---
-    if st.session_state.get('show_explanation', False):
-        st.markdown("---")
-        # --- Render Explanation Body using DEDENTED markdown ---
-        explanation_html = textwrap.dedent(f"""
-            <div class="explanation-container">
-                <div class="explanation-title">💡 Explanation</div>
-                <div class="explanation-content" style="font-size: {st.session_state.font_size - 2}px;">
-                    {question.processed_explanation_html}
-                </div>
-            </div>
-        """)
-        st.markdown(explanation_html, unsafe_allow_html=True)
 
-        # --- Render Primary Explanation Assets ---
+    # --- EXPLANATION AND ASSET REFERENCE DESK ---
+    if st.session_state.get('show_explanation', False):
+        st.divider()
+        st.markdown("### Explanation")
+        st.markdown(f"<div style='font-size: {st.session_state.font_size-2}px;'>{question.processed_explanation_html}</div>", unsafe_allow_html=True)
         if question.primary_explanation_assets:
-            st.write("**Explanation Media:**")
+            st.write("**Associated Media:**")
             for asset in question.primary_explanation_assets:
                 if asset.asset_type == AssetType.IMAGE:
                     st.image(asset.file_path, caption=asset.name)
                 elif asset.asset_type == AssetType.AUDIO:
                     st.audio(asset.file_path)
+
+        # --- THE ASSET REFERENCE DESK ---
+        if question.inline_assets:
+            st.write("**Referenced Media:**")
+            for i, asset in enumerate(question.inline_assets):
+                ref_cols = st.columns([0.1, 0.9])
+                with ref_cols[0]:
+                    st.markdown(f"**[{i+1}]**")
+                with ref_cols[1]:
+                    if st.button(asset.link_text, key=asset.uuid, use_container_width=True):
+                        st.session_state.asset_to_show = asset.uuid
+                        st.rerun()
+
+    # --- MODAL DISPLAY LOGIC (MOVED TO THE BOTTOM) ---
+    if st.session_state.asset_to_show:
+        asset_id_to_show = st.session_state.asset_to_show
+        asset = next((a for a in question.inline_assets if a.uuid == asset_id_to_show), None)
+        
+        if asset:
+            st.divider()
+            with st.container():
+                st.markdown(f"#### Viewing: {asset.link_text}")
+                
+                if asset.asset_type in [AssetType.PAGE, AssetType.TABLE]:
+                    components.html(asset.html_content, height=400, scrolling=True)
+                else: # Image, Audio, Video
+                    if asset.asset_type == AssetType.IMAGE: st.image(asset.file_path, use_column_width=True)
+                    elif asset.asset_type == AssetType.AUDIO: st.audio(asset.file_path)
+                    elif asset.asset_type == AssetType.VIDEO: st.video(asset.file_path)
+
+                if st.button("Close Viewer", key=f"close_asset_{asset_id_to_show}"):
+                    st.session_state.asset_to_show = None
+                    st.rerun()
+
 
 # --- Main Application Router ---
 if st.session_state.selected_question_id is None:
