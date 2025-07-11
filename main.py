@@ -2,7 +2,8 @@ import streamlit as st
 from database import db_client
 import config
 from updated_legacy_adapter import updated_legacy_adapter
-from updated_question_service import updated_question_service
+from question_service import question_service
+from models import AssetType
 from bs4 import BeautifulSoup
 import re
 
@@ -13,13 +14,11 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- Initialize Services ---
-question_service = updated_question_service
-
-# --- Question Function (removed caching to fix bug where all questions showed same content) ---
+# --- Question Function ---
+@st.cache_data(show_spinner="Fetching question...")
 def get_cached_question(question_id):
-    """Fetch question data - caching removed to prevent showing wrong questions"""
-    return question_service.get_question_by_id(question_id)
+    """Retrieves and caches the fully processed question object."""
+    return question_service.get_question(question_id)
 
 def clean_html_content(html_string):
     """Clean HTML content to remove artifacts and malformed tags"""
@@ -121,7 +120,7 @@ with st.sidebar:
         st.subheader("⚡ Actions")
         
         # Get current question for button states
-        question = question_service.get_question_by_id(st.session_state.selected_question_id)
+        question = question_service.get_question(st.session_state.selected_question_id)
         
         # Back to List button
         if st.button("⬅️ Back to List", use_container_width=True):
@@ -133,19 +132,8 @@ with st.sidebar:
             st.rerun()
         
         if question:
-            # Favorite button
-            fav_text = "⭐ Favorited" if question.is_favorite else "☆ Favorite"
-            fav_type = "secondary" if question.is_favorite else "primary"
-            if st.button(fav_text, type=fav_type, use_container_width=True):
-                question_service.toggle_favorite(st.session_state.selected_question_id)
-                st.rerun()
-            
-            # Mark button
-            mark_text = "🚩 Marked" if question.difficult else "🏳️ Mark"
-            mark_type = "secondary" if question.difficult else "primary"
-            if st.button(mark_text, type=mark_type, use_container_width=True):
-                question_service.toggle_marked(st.session_state.selected_question_id)
-                st.rerun()
+            # Note: Favorite and Mark functionality temporarily disabled during refactoring
+            st.info("Favorite and Mark features will be restored in the next phase.")
 
     with st.expander("ℹ️ About & Help"):
         st.info(
@@ -466,8 +454,13 @@ def display_question_detail():
                 st.session_state.font_size = max(st.session_state.font_size - 2, 12)
                 st.rerun()
 
+    # --- Display Question Header ---
+    st.subheader(f"Question: {question.name}")
+    st.caption(f"Source: {question.source} | Tags: {', '.join(question.tags)}")
+    st.divider()
+
     # --- Clean Question HTML (remove all artifacts) ---
-    cleaned_question_html = clean_html_content(question.question_html)
+    cleaned_question_html = clean_html_content(question.processed_question_html)
     
     # --- Question Container ---
     st.markdown(f"""
@@ -477,6 +470,15 @@ def display_question_detail():
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+    # --- Render Primary Assets for the Question ---
+    if question.primary_question_assets:
+        st.write("**Question Media:**")
+        for asset in question.primary_question_assets:
+            if asset.asset_type == AssetType.IMAGE:
+                st.image(asset.file_path, caption=asset.name)
+            elif asset.asset_type == AssetType.AUDIO:
+                st.audio(asset.file_path)
 
     # --- Interactive Choices with Direct CSS Styling ---
     if question.choices:
@@ -550,12 +552,12 @@ def display_question_detail():
 
 
     # --- Explanation Section (loads instantly due to caching) ---
-    if st.session_state.show_explanation and question.explanation_html:
+    if st.session_state.show_explanation and question.processed_explanation_html:
         # Clean explanation HTML
-        cleaned_explanation_html = clean_html_content(question.explanation_html)
+        cleaned_explanation_html = clean_html_content(question.processed_explanation_html)
         
         st.markdown("---")
-        explanation_title = "💡 Explanation"
+        explanation_title = "��� Explanation"
         st.markdown(f"""
         <div class="explanation-container">
             <div class="explanation-title">
@@ -566,6 +568,15 @@ def display_question_detail():
             </div>
         </div>
         """, unsafe_allow_html=True)
+
+        # --- Render Primary Assets for the Explanation ---
+        if question.primary_explanation_assets:
+            st.write("**Explanation Media:**")
+            for asset in question.primary_explanation_assets:
+                if asset.asset_type == AssetType.IMAGE:
+                    st.image(asset.file_path, caption=asset.name)
+                elif asset.asset_type == AssetType.AUDIO:
+                    st.audio(asset.file_path)
 
 
 # --- Main Application Router ---
