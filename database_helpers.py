@@ -23,3 +23,9 @@ def get_asset_type_from_db(asset_id: str) -> AssetType | None:
     if db_client.get_collection("Tables").find_one({"_id": asset_id}, {"_id": 1}):
         return AssetType.TABLE
     return None
+
+def get_content_asset_html(asset_id: str, asset_type: AssetType) -> str | None:
+    """Fetches the HTML content for a Page or Table asset."""
+    collection_name = "Pages" if asset_type == AssetType.PAGE else "Tables"
+    doc = get_asset_document_by_id(asset_id, collection_name)
+    return doc.get("html") if doc else None

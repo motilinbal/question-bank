@@ -1,9 +1,11 @@
 # question_service.py
 
 import streamlit as st
+import re
+from typing import Union
 from database import db_client
 import database_helpers as db_helpers
-from models import Question, FileAsset, AssetType, Choice
+from models import Question, FileAsset, AssetType, Choice, ContentAsset, LinkAsset
 
 class QuestionService:
     @st.cache_data(show_spinner=False)
@@ -42,9 +44,31 @@ class QuestionService:
                 )
                 primary_question_assets.append(asset)
         
-        # (This logic would be duplicated for primary_explanation_assets)
-        # For now, we'll leave it empty to keep the example concise.
-        primary_explanation_assets = [] 
+        # --- Fetch Primary Explanation Assets (from 'images' field) ---
+        primary_explanation_assets = []
+        for asset_id in question_doc.get("images", {}).get("explanation", []):
+            # Check if it's an Image
+            image_doc = db_helpers.get_asset_document_by_id(asset_id, "Images")
+            if image_doc:
+                asset = FileAsset(
+                    uuid=asset_id,
+                    name=image_doc.get("name", ""),
+                    asset_type=AssetType.IMAGE,
+                    file_path=f"assets/images/{image_doc.get('name', '')}"
+                )
+                primary_explanation_assets.append(asset)
+                continue
+
+            # Check if it's Audio
+            audio_doc = db_helpers.get_asset_document_by_id(asset_id, "Audio")
+            if audio_doc:
+                asset = FileAsset(
+                    uuid=asset_id,
+                    name=audio_doc.get("name", ""),
+                    asset_type=AssetType.AUDIO,
+                    file_path=f"assets/audio/{audio_doc.get('name', '')}"
+                )
+                primary_explanation_assets.append(asset) 
 
         # --- Create the Question Model ---
         question_model = Question(
@@ -65,9 +89,59 @@ class QuestionService:
 
         return question_model
 
+    def _hydrate_html(self, html: str) -> str:
+        """
+        Parses HTML content to find all [[...]] placeholders and replaces them
+        with the appropriate links or content.
+        """
+        if not html:
+            return ""
+
+        # Regex to find all occurrences of [[...]]
+        placeholder_pattern = re.compile(r"\[\[(.*?)\]\]")
+        
+        # Using a function for the replacement logic
+        def replace_placeholder(match):
+            content = match.group(1)
+
+            # Check if it's an external URL
+            if content.startswith("http"):
+                return f'<a href="{content}" target="_blank" rel="noopener noreferrer">{content}</a>'
+            
+            # It's an internal UUID, find its type
+            asset_id = content
+            asset_type = db_helpers.get_asset_type_from_db(asset_id)
+
+            if asset_type in [AssetType.PAGE, AssetType.TABLE]:
+                # For Pages and Tables, create a link that can trigger a modal in the UI
+                # The href points to the asset type and ID for the UI to handle
+                return f'<a href="/viewer/{asset_type.value}/{asset_id}" target="_blank">{asset_type.value.capitalize()}</a>'
+            
+            if asset_type in [AssetType.IMAGE, AssetType.VIDEO, AssetType.AUDIO]:
+                # For file assets, create a direct link to the file
+                doc = db_helpers.get_asset_document_by_id(asset_id, f"{asset_type.value.capitalize()}s")
+                if doc:
+                    file_path = f"assets/{asset_type.value}s/{doc.get('name', '')}"
+                    return f'<a href="{file_path}" target="_blank">View {asset_type.value.capitalize()}</a>'
+            
+            # If the asset is not found or type is unknown, return a placeholder
+            return f'[Asset Not Found: {asset_id}]'
+
+        return placeholder_pattern.sub(replace_placeholder, html)
+
     def get_question(self, question_id: str) -> Question | None:
-        """Public method to get the raw question."""
-        return self._fetch_raw_question_by_id(question_id)
+        """
+        Public method to get the fully processed and hydrated question.
+        """
+        question = self._fetch_raw_question_by_id(question_id)
+        if not question:
+            return None
+        
+        # Hydrate the HTML
+        question.processed_question_html = self._hydrate_html(question.raw_question_html)
+        question.processed_explanation_html = self._hydrate_html(question.raw_explanation_html)
+        
+        return question
 
 # Instantiate a singleton of the service for the app to use
 question_service = QuestionService()
