@@ -19,35 +19,35 @@ def get_cached_question(question_id):
     """Retrieves and caches the fully processed question object."""
     return question_service.get_question(question_id)
 
-def clean_html_content(html_string):
-    """Clean HTML content to remove artifacts and malformed tags"""
-    if not html_string:
-        return ""
+# def clean_html_content(html_string):
+#     """Clean HTML content to remove artifacts and malformed tags"""
+#     if not html_string:
+#         return ""
     
-    # Remove the specific artifacts mentioned - handle various patterns
-    cleaned = html_string
+#     # Remove the specific artifacts mentioned - handle various patterns
+#     cleaned = html_string
     
-    # Remove </div></div> as single string
-    cleaned = cleaned.replace("</div></div>", "")
+#     # Remove </div></div> as single string
+#     cleaned = cleaned.replace("</div></div>", "")
     
-    # Remove line-separated </div> artifacts with various whitespace patterns
-    cleaned = re.sub(r'</div>\s*\n\s*</div>', '', cleaned)
-    cleaned = re.sub(r'</div>\s*</div>', '', cleaned)
+#     # Remove line-separated </div> artifacts with various whitespace patterns
+#     cleaned = re.sub(r'</div>\s*\n\s*</div>', '', cleaned)
+#     cleaned = re.sub(r'</div>\s*</div>', '', cleaned)
     
-    # Remove trailing orphaned </div> tags
-    cleaned = re.sub(r'</div>\s*$', '', cleaned.strip())
+#     # Remove trailing orphaned </div> tags
+#     cleaned = re.sub(r'</div>\s*$', '', cleaned.strip())
     
-    # Remove multiple consecutive </div> tags
-    cleaned = re.sub(r'(</div>\s*){2,}', '', cleaned)
+#     # Remove multiple consecutive </div> tags
+#     cleaned = re.sub(r'(</div>\s*){2,}', '', cleaned)
     
-    # Remove <p> tags using regex for thorough cleaning
-    cleaned = re.sub(r'</?p[^>]*>', '', cleaned)
+#     # Remove <p> tags using regex for thorough cleaning
+#     cleaned = re.sub(r'</?p[^>]*>', '', cleaned)
     
-    # Clean up extra whitespace that might be left behind
-    cleaned = re.sub(r'\n\s*\n', '\n', cleaned)
-    cleaned = cleaned.strip()
+#     # Clean up extra whitespace that might be left behind
+#     cleaned = re.sub(r'\n\s*\n', '\n', cleaned)
+#     cleaned = cleaned.strip()
     
-    return cleaned
+#     return cleaned
 
 
 # --- Helper Functions ---
@@ -442,63 +442,49 @@ def display_pagination_controls(total_pages, position="top"):
             st.rerun()
 
 
+# In main.py, replace the entire old function with this new one:
+
 def display_question_detail():
-    """Displays an interactive question with sleek dark theme, instant performance, and visual-only feedback."""
+    """
+    Displays an interactive question with a sleek dark theme, instant performance,
+    and correct rendering of all assets.
+    """
     # Load custom CSS
     load_custom_css()
     
     q_id = st.session_state.selected_question_id
     
-    # Core Caching Logic: Fetch from DB only if the selected question has changed
-    if st.session_state.current_question_id != q_id:
-        # It's a new question, so we fetch it from the database
-        question = get_cached_question(q_id)
-        if not question:
-            st.error("Question not found!")
-            st.session_state.selected_question_id = None
-            return
-        
-        # Store the newly fetched question and its ID in the session state
-        st.session_state.current_question = question
-        st.session_state.current_question_id = q_id
-        
-        # Reset submission state for the new question
-        st.session_state.submitted = False
-        st.session_state.selected_answer = None
-        st.session_state.show_explanation = False
-    else:
-        # It's the same question, just use the cached version (INSTANT!)
-        question = st.session_state.current_question
+    # Use the cached, fully processed question object from our service
+    question = get_cached_question(q_id)
+    if not question:
+        st.error("Question not found!")
+        st.session_state.selected_question_id = None
+        return
 
-    # --- Font Size Controls (now instant due to caching) ---
+    # --- Font Size Controls ---
     col1, col2 = st.columns([10, 1])
     with col2:
         font_col1, font_col2 = st.columns(2)
         with font_col1:
             if st.button("➕", help="Increase font size", key="font_plus"):
                 st.session_state.font_size = min(st.session_state.font_size + 2, 28)
-                st.rerun()
         with font_col2:
             if st.button("➖", help="Decrease font size", key="font_minus"):
                 st.session_state.font_size = max(st.session_state.font_size - 2, 12)
-                st.rerun()
 
     # --- Display Question Header ---
     st.subheader(f"Question: {question.name}")
     st.caption(f"Source: {question.source} | Tags: {', '.join(question.tags)}")
     st.divider()
 
-    # --- Clean Question HTML (remove all artifacts) ---
-    cleaned_question_html = clean_html_content(question.processed_question_html)
-    
-    # --- Question Container ---
-    st.markdown(f"""
-    <div class="question-container">
-        <div class="question-text" style="font-size: {st.session_state.font_size}px;">
-            {cleaned_question_html}
+    # --- Render Question Body using st.html ---
+    st.html(f"""
+        <div class="question-container">
+            <div class="question-text" style="font-size: {st.session_state.font_size}px;">
+                {question.processed_question_html}
+            </div>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
+    """)
 
     # --- Render Primary Assets for the Question ---
     if question.primary_question_assets:
@@ -509,69 +495,44 @@ def display_question_detail():
             elif asset.asset_type == AssetType.AUDIO:
                 st.audio(asset.file_path)
 
-    # --- Interactive Choices with Direct CSS Styling ---
+    # --- Interactive Choices Section ---
     if question.choices:
-        if not st.session_state.submitted:
-            # Before submission: Use radio buttons for selection
+        if not st.session_state.get('submitted', False):
+            # BEFORE SUBMISSION: Render choices as radio buttons
             choice_options = []
             choice_mapping = {}
-            for i, choice in enumerate(question.choices):
-                # Clean choice text using the same robust cleaning function
-                cleaned_choice_text = clean_html_content(choice.text)
-                # Remove any remaining HTML tags and get clean text
-                clean_choice_text = BeautifulSoup(cleaned_choice_text, 'html.parser').get_text(strip=True)
-                choice_display = f"{choice.id}. {clean_choice_text}"
-                choice_options.append(choice_display)
-                choice_mapping[choice_display] = choice
+            for choice in question.choices:
+                # Use BeautifulSoup to safely get text from choice HTML
+                clean_text = BeautifulSoup(choice.text, 'html.parser').get_text(strip=True)
+                display_text = f"{choice.id}. {clean_text}"
+                choice_options.append(display_text)
+                choice_mapping[display_text] = choice
             
-            # Radio button for choice selection
-            selected_choice_text = st.radio(
-                "Choices",
-                options=choice_options,
-                key=f"choices_{q_id}",
-                label_visibility="collapsed"
+            selected_choice_display = st.radio(
+                "Choices", options=choice_options, key=f"choices_{q_id}", label_visibility="collapsed"
             )
             
-            if selected_choice_text:
-                st.session_state.selected_answer = choice_mapping[selected_choice_text]
+            if selected_choice_display:
+                st.session_state.selected_answer = choice_mapping[selected_choice_display]
         else:
-            # After submission: Show choices with color-coded borders
+            # AFTER SUBMISSION: Render choices as styled divs
             for choice in question.choices:
-                # Clean choice text
-                cleaned_choice_text = clean_html_content(choice.text)
-                clean_choice_text = BeautifulSoup(cleaned_choice_text, 'html.parser').get_text(strip=True)
+                clean_text = BeautifulSoup(choice.text, 'html.parser').get_text(strip=True)
                 
-                # Determine border color and style
-                border_color = "#ccc"  # Default gray
-                border_width = "1px"
-                
+                border_color, border_width = "#ccc", "1px" # Default style
                 if choice.is_correct:
-                    # Correct answer gets green border
-                    border_color = "#28a745"
-                    border_width = "2px"
-                elif st.session_state.selected_answer and choice.id == st.session_state.selected_answer.id and not choice.is_correct:
-                    # User's incorrect choice gets red border
-                    border_color = "#dc3545"
-                    border_width = "2px"
+                    border_color, border_width = "#28a745", "2px" # Correct
+                elif st.session_state.selected_answer and choice.id == st.session_state.selected_answer.id:
+                    border_color, border_width = "#dc3545", "2px" # Incorrectly chosen
                 
-                # Display choice with appropriate styling
-                st.markdown(f"""
-                <div style="
-                    border: {border_width} solid {border_color};
-                    border-radius: 10px;
-                    padding: 1rem 1.5rem;
-                    margin: 0.5rem 0;
-                    background: transparent;
-                    color: #FAFAFA;
-                    font-size: 16px;
-                    line-height: 1.5;
-                ">
-                    {choice.id}. {clean_choice_text}
-                </div>
-                """, unsafe_allow_html=True)
+                st.html(f"""
+                    <div style="border: {border_width} solid {border_color}; border-radius: 10px; padding: 1rem 1.5rem; margin: 0.5rem 0;">
+                        {choice.id}. {clean_text}
+                    </div>
+                """)
 
-        # --- Submit Button (explanation loads instantly due to caching) ---
-        if not st.session_state.submitted and st.session_state.selected_answer:
+        # --- Submit Button ---
+        if not st.session_state.get('submitted', False) and st.session_state.get('selected_answer'):
             col1, col2, col3 = st.columns([2, 1, 2])
             with col2:
                 if st.button("Submit", type="primary", use_container_width=True):
@@ -579,23 +540,17 @@ def display_question_detail():
                     st.session_state.show_explanation = True
                     st.rerun()
 
-
-    # --- Explanation Section (loads instantly due to caching) ---
-    if st.session_state.show_explanation and question.processed_explanation_html:
-        # HTML is already processed by our service, no cleaning needed
-        
+    # --- Explanation Section ---
+    if st.session_state.get('show_explanation', False) and question.processed_explanation_html:
         st.markdown("---")
-        explanation_title = "💡 Explanation"
-        st.markdown(f"""
-        <div class="explanation-container">
-            <div class="explanation-title">
-                {explanation_title}
+        st.html(f"""
+            <div class="explanation-container">
+                <div class="explanation-title">💡 Explanation</div>
+                <div class="explanation-content" style="font-size: {st.session_state.font_size - 2}px;">
+                    {question.processed_explanation_html}
+                </div>
             </div>
-            <div class="explanation-content" style="font-size: {st.session_state.font_size - 2}px;">
-                {question.processed_explanation_html}
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        """)
 
         # --- Render Primary Assets for the Explanation ---
         if question.primary_explanation_assets:
