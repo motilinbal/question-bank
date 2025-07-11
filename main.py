@@ -451,6 +451,21 @@ def display_question_detail():
     """
     load_custom_css()
     
+
+    # --- DEBUGGING STEP 2: TEST STATIC ASSET SERVING ---
+    st.subheader("--- DEBUGGER 2.0 ---")
+
+    # Using a real image filename from our assets/images/ folder
+    test_image_path = "assets/images/21-10-23 18.59.15.jpg"
+
+    st.write("Testing asset display with `st.image`:")
+    try:
+        st.image(test_image_path, caption=f"Attempting to load: {test_image_path}")
+    except Exception as e:
+        st.error(f"Failed to load image with st.image: {e}")
+
+    st.subheader("--- END DEBUGGER ---")
+    # --- END OF DEBUGGING CODE ---
     q_id = st.session_state.selected_question_id
     question = get_cached_question(q_id)
 
@@ -459,18 +474,14 @@ def display_question_detail():
         st.session_state.selected_question_id = None
         return
 
-    # --- Font Size Controls ---
-    col1, col2 = st.columns([10, 1])
-    with col2:
-        font_col1, font_col2 = st.columns(2)
-        with font_col1:
-            if st.button("➕", help="Increase font size", key="font_plus"):
-                st.session_state.font_size = min(st.session_state.font_size + 2, 28)
-                st.rerun()
-        with font_col2:
-            if st.button("➖", help="Decrease font size", key="font_minus"):
-                st.session_state.font_size = max(st.session_state.font_size - 2, 12)
-                st.rerun()
+    # --- Font Size Controls (DEBUGGING) ---
+    if st.button("➕", help="Increase font size", key="font_plus"):
+        st.session_state.font_size = min(st.session_state.font_size + 2, 28)
+        st.rerun()
+
+    if st.button("➖", help="Decrease font size", key="font_minus"):
+        st.session_state.font_size = max(st.session_state.font_size - 2, 12)
+        st.rerun()
 
     # --- Display Question Header ---
     st.subheader(f"Question: {question.name}")
