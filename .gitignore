@@ -20,3 +20,4 @@ __pycache__/
 
 # assets folder
 static/
+assets/

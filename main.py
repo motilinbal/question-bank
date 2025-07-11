@@ -62,10 +62,10 @@ def get_filter_options():
         return [], []
     
     try:
-        # Use updated legacy adapter to get sources and tags
-        sources = updated_legacy_adapter.get_sources()
-        tags = updated_legacy_adapter.get_tags()
-        return sources, tags
+        # Get sources and tags directly from database
+        sources = db_client.get_collection("Questions").distinct("source")
+        tags = db_client.get_collection("Questions").distinct("tags")
+        return sorted(sources), sorted(tags)
     except Exception as e:
         st.error(f"‚ùå Error fetching filter options: {e}")
         return [], []
@@ -318,15 +318,45 @@ def display_question_list():
 
     # Fetch paginated results
     try:
-        result = updated_legacy_adapter.find_questions_paginated(
-            current_query, 
-            page=st.session_state.current_page, 
-            page_size=st.session_state.page_size
-        )
+        # Build MongoDB query
+        mongo_query = {}
+        if "text" in current_query:
+            # Text search in question and explanation fields
+            mongo_query["$or"] = [
+                {"question": {"$regex": current_query["text"], "$options": "i"}},
+                {"explanation": {"$regex": current_query["text"], "$options": "i"}},
+                {"name": {"$regex": current_query["text"], "$options": "i"}}
+            ]
+        if "source" in current_query:
+            mongo_query["source"] = current_query["source"]
+        if "tags" in current_query:
+            mongo_query["tags"] = current_query["tags"]
+        # Note: Favorite and marked filters temporarily disabled during refactoring
         
-        st.session_state.question_list = result["questions"]
-        st.session_state.total_questions = result["total_count"]
-        total_pages = result["total_pages"]
+        # Get total count
+        total_count = db_client.get_collection("Questions").count_documents(mongo_query)
+        
+        # Calculate pagination
+        skip = (st.session_state.current_page - 1) * st.session_state.page_size
+        total_pages = (total_count + st.session_state.page_size - 1) // st.session_state.page_size
+        
+        # Get paginated results
+        cursor = db_client.get_collection("Questions").find(mongo_query).skip(skip).limit(st.session_state.page_size)
+        questions = []
+        
+        for doc in cursor:
+            # Create a simple question object for the list view
+            question_obj = type('Question', (), {
+                'question_id': doc['_id'],
+                'source': doc.get('source', ''),
+                'tags': doc.get('tags', []),
+                'is_favorite': False,  # Temporarily disabled
+                'difficult': False     # Temporarily disabled
+            })()
+            questions.append(question_obj)
+        
+        st.session_state.question_list = questions
+        st.session_state.total_questions = total_count
         
     except Exception as e:
         st.error(f"Error fetching questions: {e}")
@@ -552,18 +582,17 @@ def display_question_detail():
 
     # --- Explanation Section (loads instantly due to caching) ---
     if st.session_state.show_explanation and question.processed_explanation_html:
-        # Clean explanation HTML
-        cleaned_explanation_html = clean_html_content(question.processed_explanation_html)
+        # HTML is already processed by our service, no cleaning needed
         
         st.markdown("---")
-        explanation_title = "üí° Explanation"
+        explanation_title = "üí° Explanation"
         st.markdown(f"""
         <div class="explanation-container">
             <div class="explanation-title">
                 {explanation_title}
             </div>
             <div class="explanation-content" style="font-size: {st.session_state.font_size - 2}px;">
-                {cleaned_explanation_html}
+                {question.processed_explanation_html}
             </div>
         </div>
         """, unsafe_allow_html=True)
