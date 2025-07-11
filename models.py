@@ -3,6 +3,37 @@ from typing import List, Optional, Dict, Union
 from datetime import datetime
 from enum import Enum
 
+# --- Asset Models (defined first so they can be used in Question) ---
+
+class AssetType(str, Enum):
+    """Enumeration for the different types of assets."""
+    IMAGE = "image"
+    AUDIO = "audio"
+    VIDEO = "video"
+    PAGE = "page"
+    TABLE = "table"
+    EXTERNAL_LINK = "external_link"
+
+class BaseAsset(BaseModel):
+    """A base model for all asset types, containing common fields."""
+    uuid: str
+    asset_type: AssetType
+
+class FileAsset(BaseAsset):
+    """Represents an asset that corresponds to a physical file on the server."""
+    name: str
+    file_path: str
+
+class ContentAsset(BaseAsset):
+    """Represents an asset whose content is stored directly as HTML in the database."""
+    name: str
+    html_content: str
+
+class LinkAsset(BaseModel):
+    """Represents a simple external hyperlink."""
+    url: str
+    asset_type: AssetType = AssetType.EXTERNAL_LINK
+
 # A sub-model for the multiple-choice answers
 class Choice(BaseModel):
     text: str
@@ -67,34 +98,3 @@ class Source(BaseModel):
         validate_by_name = True
         populate_by_name = True
 
-
-# --- New Asset Models ---
-
-class AssetType(str, Enum):
-    """Enumeration for the different types of assets."""
-    IMAGE = "image"
-    AUDIO = "audio"
-    VIDEO = "video"
-    PAGE = "page"
-    TABLE = "table"
-    EXTERNAL_LINK = "external_link"
-
-class BaseAsset(BaseModel):
-    """A base model for all asset types, containing common fields."""
-    uuid: str
-    asset_type: AssetType
-
-class FileAsset(BaseAsset):
-    """Represents an asset that corresponds to a physical file on the server."""
-    name: str
-    file_path: str
-
-class ContentAsset(BaseAsset):
-    """Represents an asset whose content is stored directly as HTML in the database."""
-    name: str
-    html_content: str
-
-class LinkAsset(BaseModel):
-    """Represents a simple external hyperlink."""
-    url: str
-    asset_type: AssetType = AssetType.EXTERNAL_LINK
