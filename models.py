@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Union
 from datetime import datetime
+from enum import Enum
 
 # A sub-model for the multiple-choice answers
 class Choice(BaseModel):
@@ -14,36 +15,33 @@ class ImageSet(BaseModel):
     explanation: List[str] = Field(default_factory=list)
 
 class Question(BaseModel):
-    # Map the DB's string '_id' to our main identifier 'question_id'
-    question_id: str = Field(..., alias="_id")
+    """
+    Represents a fully processed question, including all its categorized assets and processed HTML.
+    This is the "target" model that our new service will produce.
+    """
+    id: str
     name: str
     source: str
-    tags: List[str] = Field(default_factory=list)
-
-    # Use the exact field name 'images' and the new ImageSet model
-    images: ImageSet = Field(default_factory=ImageSet)
-
-    # Use clearer names for the HTML content
-    question_html: str = Field(..., alias="question")
-    explanation_html: str = Field(..., alias="explanation")
-
-    # The list of choices using our new Choice model
-    choices: List[Choice]
-
-    # Align with the database's boolean flags
-    flagged: bool = False
-    difficult: bool = False
-
-    # --- Fields we are adding for our app's functionality ---
+    tags: list[str]
+    choices: list[Choice]
     is_favorite: bool = False
-    notes: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    is_marked: bool = False
+    notes: str = ""
 
-    class Config:
-        # Pydantic v2 configuration
-        validate_by_name = True
-        populate_by_name = True
+    # Raw HTML content from the database
+    raw_question_html: str
+    raw_explanation_html: str
+
+    # HTML content after [[...]] placeholders have been processed
+    processed_question_html: str = ""
+    processed_explanation_html: str = ""
+
+    # Structured lists of all assets associated with the question
+    primary_question_assets: list[FileAsset] = []
+    primary_explanation_assets: list[FileAsset] = []
+    
+    # We will populate this list in a later phase
+    # inline_assets: list[Union[FileAsset, ContentAsset, LinkAsset]] = []
 
 
 # MediaItem and Source models remain the same as they describe our *target* schema
@@ -68,3 +66,35 @@ class Source(BaseModel):
     class Config:
         validate_by_name = True
         populate_by_name = True
+
+
+# --- New Asset Models ---
+
+class AssetType(str, Enum):
+    """Enumeration for the different types of assets."""
+    IMAGE = "image"
+    AUDIO = "audio"
+    VIDEO = "video"
+    PAGE = "page"
+    TABLE = "table"
+    EXTERNAL_LINK = "external_link"
+
+class BaseAsset(BaseModel):
+    """A base model for all asset types, containing common fields."""
+    uuid: str
+    asset_type: AssetType
+
+class FileAsset(BaseAsset):
+    """Represents an asset that corresponds to a physical file on the server."""
+    name: str
+    file_path: str
+
+class ContentAsset(BaseAsset):
+    """Represents an asset whose content is stored directly as HTML in the database."""
+    name: str
+    html_content: str
+
+class LinkAsset(BaseModel):
+    """Represents a simple external hyperlink."""
+    url: str
+    asset_type: AssetType = AssetType.EXTERNAL_LINK
