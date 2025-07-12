@@ -196,5 +196,61 @@ class QuestionService:
         question.inline_assets = all_inline_assets
         return question
 
+    def toggle_favorite(self, question_id: str) -> bool:
+        """
+        Toggles the favorite status of a question.
+        Returns the new favorite status.
+        """
+        # Get current status
+        question_doc = db_client.get_collection("Questions").find_one({"_id": question_id})
+        if not question_doc:
+            return False
+        
+        current_status = question_doc.get("difficult", False)
+        new_status = not current_status
+        
+        # Update the status
+        db_helpers.set_favorite_status(question_id, new_status)
+        
+        # Clear cache to ensure fresh data on next load
+        self._fetch_raw_question_by_id.clear()
+        
+        return new_status
+
+    def toggle_done(self, question_id: str) -> bool:
+        """
+        Toggles the done status of a question.
+        Returns the new done status.
+        """
+        # Get current status
+        question_doc = db_client.get_collection("Questions").find_one({"_id": question_id})
+        if not question_doc:
+            return False
+        
+        current_status = question_doc.get("flagged", False)
+        new_status = not current_status
+        
+        # Update the status
+        db_helpers.set_done_status(question_id, new_status)
+        
+        # Clear cache to ensure fresh data on next load
+        self._fetch_raw_question_by_id.clear()
+        
+        return new_status
+
+    def get_question_status(self, question_id: str) -> dict:
+        """
+        Gets the current favorite and done status of a question.
+        Returns a dict with 'is_favorite' and 'is_done' keys.
+        """
+        question_doc = db_client.get_collection("Questions").find_one({"_id": question_id})
+        if not question_doc:
+            return {"is_favorite": False, "is_done": False}
+        
+        return {
+            "is_favorite": question_doc.get("difficult", False),
+            "is_done": question_doc.get("flagged", False)
+        }
+
 # Instantiate a singleton of the service for the app to use
 question_service = QuestionService()

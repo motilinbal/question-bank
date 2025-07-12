@@ -84,7 +84,7 @@ with st.sidebar:
     selected_tags = st.multiselect("Filter by Tags", options=all_tags)
     st.markdown("---")
     show_favorites_only = st.checkbox("Show Favorites Only ⭐")
-    show_marked_only = st.checkbox("Show Marked Only 🔖")
+    show_done_only = st.checkbox("Show Done Only 🔖")
 
     # --- Actions Section (only show when viewing a question) ---
     if st.session_state.selected_question_id is not None:
@@ -104,8 +104,22 @@ with st.sidebar:
             st.rerun()
         
         if question:
-            # Note: Favorite and Mark functionality temporarily disabled during refactoring
-            st.info("Favorite and Mark features will be restored in the next phase.")
+            # Get current status
+            status = question_service.get_question_status(st.session_state.selected_question_id)
+            is_favorite = status["is_favorite"]
+            is_done = status["is_done"]
+            
+            # Favorite button
+            fav_text = "Unfavorite ⭐" if is_favorite else "Favorite ⭐"
+            if st.button(fav_text, use_container_width=True, key="toggle_favorite"):
+                question_service.toggle_favorite(st.session_state.selected_question_id)
+                st.rerun()
+            
+            # Done button
+            done_text = "Mark as Not Done ✅" if is_done else "Mark as Done ✅"
+            if st.button(done_text, use_container_width=True, key="toggle_done"):
+                question_service.toggle_done(st.session_state.selected_question_id)
+                st.rerun()
 
     with st.expander("ℹ️ About & Help"):
         st.info(
@@ -281,8 +295,8 @@ def display_question_list():
         current_query["tags"] = {"$in": selected_tags}
     if show_favorites_only:
         current_query["is_favorite"] = True
-    if show_marked_only:
-        current_query["is_marked"] = True
+    if show_done_only:
+        current_query["is_done"] = True
 
     # Check if query changed - if so, reset to page 1
     if current_query != st.session_state.last_query:
@@ -304,7 +318,16 @@ def display_question_list():
             mongo_query["source"] = current_query["source"]
         if "tags" in current_query:
             mongo_query["tags"] = current_query["tags"]
-        # Note: Favorite and marked filters temporarily disabled during refactoring
+        # Handle favorite filter
+        if "is_favorite" in current_query:
+            mongo_query["difficult"] = True
+        
+        # Handle done filter - by default exclude done questions unless specifically requested
+        if "is_done" in current_query:
+            mongo_query["flagged"] = True
+        else:
+            # By default, exclude done questions (flagged=True)
+            mongo_query["flagged"] = {"$ne": True}
         
         # Get total count
         total_count = db_client.get_collection("Questions").count_documents(mongo_query)
@@ -323,8 +346,8 @@ def display_question_list():
                 'question_id': doc['_id'],
                 'source': doc.get('source', ''),
                 'tags': doc.get('tags', []),
-                'is_favorite': False,  # Temporarily disabled
-                'difficult': False     # Temporarily disabled
+                'is_favorite': doc.get('difficult', False),
+                'difficult': doc.get('difficult', False)
             })()
             questions.append(question_obj)
         

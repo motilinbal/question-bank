@@ -29,3 +29,21 @@ def get_content_asset_html(asset_id: str, asset_type: AssetType) -> str | None:
     collection_name = "Pages" if asset_type == AssetType.PAGE else "Tables"
     doc = get_asset_document_by_id(asset_id, collection_name)
     return doc.get("html") if doc else None
+
+def set_favorite_status(question_id: str, is_favorite: bool) -> None:
+    """
+    Updates the 'difficult' field for a given question to mark it as a favorite.
+    """
+    db_client.get_collection("Questions").update_one(
+        {"_id": question_id},
+        {"$set": {"difficult": is_favorite}}
+    )
+
+def set_done_status(question_id: str, is_done: bool) -> None:
+    """
+    Updates the 'flagged' field for a given question to mark it as done.
+    """
+    db_client.get_collection("Questions").update_one(
+        {"_id": question_id},
+        {"$set": {"flagged": is_done}}
+    )
