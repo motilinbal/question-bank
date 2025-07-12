@@ -5,6 +5,7 @@ import config
 from question_service import question_service
 from models import AssetType
 from bs4 import BeautifulSoup
+from database_helpers import get_image_dimensions
 import re
 import textwrap
 
@@ -441,6 +442,36 @@ def display_pagination_controls(total_pages, position="top"):
 
 
 
+
+def calculate_dynamic_height(html_content: str) -> int:
+    """
+    Calculates the required height for a Page asset by using the actual
+    height of its embedded background image.
+    """
+    if not html_content:
+        return 400 # Default height
+
+    # Find the UUID of the background image from the <img> tag
+    image_uuid_match = re.search(r'src="\[\[(.*?)\]\]"', html_content)
+    if not image_uuid_match:
+        # If there's no background image, return a generous default height
+        return 800
+
+    image_uuid = image_uuid_match.group(1)
+    
+    # Get the actual dimensions of the image from our helper function
+    dimensions = get_image_dimensions(image_uuid)
+    if not dimensions:
+        # Fallback if the image file is missing or dimensions can't be read
+        return 800
+
+    # The height is the second element of the (width, height) tuple
+    image_height = dimensions[1] 
+    
+    # Return the image's original height plus a small buffer for any tooltips
+    # that might be positioned near the bottom edge.
+    return image_height + 50
+
 def display_question_detail():
     load_custom_css()
     
@@ -555,7 +586,9 @@ def display_question_detail():
                 st.markdown(f"#### Viewing: {asset.link_text}")
                 
                 if asset.asset_type in [AssetType.PAGE, AssetType.TABLE]:
-                    components.html(asset.html_content, height=400, scrolling=True)
+                    # Calculate the height dynamically
+                    dynamic_height = calculate_dynamic_height(asset.html_content)
+                    components.html(asset.html_content, height=dynamic_height)
                 else: # Image, Audio, Video
                     if asset.asset_type == AssetType.IMAGE: st.image(asset.file_path, use_column_width=True)
                     elif asset.asset_type == AssetType.AUDIO: st.audio(asset.file_path)

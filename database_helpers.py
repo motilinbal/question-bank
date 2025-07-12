@@ -2,6 +2,8 @@
 
 from database import db_client
 from models import AssetType
+import os
+from PIL import Image
 
 def get_asset_document_by_id(asset_id: str, collection_name: str) -> dict | None:
     """Fetches a single asset document from a given collection by its ID."""
@@ -47,3 +49,22 @@ def set_done_status(question_id: str, is_done: bool) -> None:
         {"_id": question_id},
         {"$set": {"flagged": is_done}}
     )
+
+def get_image_dimensions(image_id: str) -> tuple[int, int] | None:
+    """
+    Finds an image by its ID and returns its (width, height) dimensions.
+    """
+    image_doc = get_asset_document_by_id(image_id, "Images")
+    if not image_doc:
+        return None
+    
+    file_path = f"assets/images/{image_doc.get('name', '')}"
+    
+    if not os.path.exists(file_path):
+        return None
+        
+    try:
+        with Image.open(file_path) as img:
+            return img.size  # Returns (width, height)
+    except Exception:
+        return None
