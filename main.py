@@ -74,6 +74,8 @@ if "current_question" not in st.session_state:
     st.session_state.current_question = None  # Will hold the full question object
 if "current_question_id" not in st.session_state:
     st.session_state.current_question_id = None  # Tracks the ID of the question being displayed
+if "iframe_height" not in st.session_state:
+    st.session_state.iframe_height = 400  # Default height for iframe
 
 # --- Sidebar for Filters ---
 with st.sidebar:
@@ -575,7 +577,7 @@ def display_question_detail():
                         st.session_state.asset_to_show = asset.uuid
                         st.rerun()
 
-    # --- MODAL DISPLAY LOGIC (MOVED TO THE BOTTOM) ---
+    # --- MODAL DISPLAY LOGIC (Corrected for Asynchronous Height Update) ---
     if st.session_state.asset_to_show:
         asset_id_to_show = st.session_state.asset_to_show
         asset = next((a for a in question.inline_assets if a.uuid == asset_id_to_show), None)
@@ -585,16 +587,50 @@ def display_question_detail():
             with st.container():
                 st.markdown(f"#### Viewing: {asset.link_text}")
                 
-                if asset.asset_type in [AssetType.PAGE, AssetType.TABLE]:
-                    # Let Streamlit automatically determine the height
-                    components.html(asset.html_content)
-                else: # Image, Audio, Video
+                if asset.asset_type == AssetType.PAGE:
+                    # This listener component is the key. It's invisible (height=0).
+                    # When the iframe sends a message, this component sets its return
+                    # value, which triggers a Streamlit script rerun.
+                    listener_html = """
+                    <script>
+                    window.addEventListener("message", (event) => {
+                        if (event.data.type === 'documedica:iframe-height') {
+                            Streamlit.setComponentValue(event.data.height);
+                        }
+                    });
+                    </script>
+                    """
+                    js_height = components.html(listener_html, height=0)
+
+                    # On the first run, js_height is None.
+                    # After the iframe loads, it sends a message, and on the *next*
+                    # script rerun, js_height will have a value.
+                    # We update our session state only when we receive a new value.
+                    if js_height is not None and isinstance(js_height, (int, float)):
+                        st.session_state.iframe_height = int(js_height)
+
+                    # We ALWAYS render the component using the height stored in session_state.
+                    # This ensures that after the second run, the component uses the
+                    # correct height that was received from the iframe.
+                    components.html(
+                        asset.html_content, 
+                        height=st.session_state.iframe_height, 
+                        scrolling=False  # Set to False as it should now be correctly sized
+                    )
+
+                elif asset.asset_type == AssetType.TABLE:
+                    # Tables have a fixed, known height.
+                    components.html(asset.html_content, height=600, scrolling=True)
+
+                else: # Handle standard Image, Audio, Video
                     if asset.asset_type == AssetType.IMAGE: st.image(asset.file_path, use_column_width=True)
                     elif asset.asset_type == AssetType.AUDIO: st.audio(asset.file_path)
                     elif asset.asset_type == AssetType.VIDEO: st.video(asset.file_path)
 
                 if st.button("Close Viewer", key=f"close_asset_{asset_id_to_show}"):
+                    # Reset state when closing the viewer
                     st.session_state.asset_to_show = None
+                    st.session_state.iframe_height = 400 # Reset to default
                     st.rerun()
 
 

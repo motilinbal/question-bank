@@ -19,109 +19,88 @@ class QuestionService:
         if not question_doc:
             return None
 
-        # --- Fetch Primary Assets (from 'images' field) ---
         primary_question_assets = []
         for asset_id in question_doc.get("images", {}).get("question", []):
-            # Check if it's an Image
             image_doc = db_helpers.get_asset_document_by_id(asset_id, "Images")
             if image_doc:
                 asset = FileAsset(
-                    uuid=asset_id,
-                    name=image_doc.get("name", ""),
-                    asset_type=AssetType.IMAGE,
-                    file_path=f"static/images/{image_doc.get('name', '')}" # Construct path
+                    uuid=asset_id, name=image_doc.get("name", ""), asset_type=AssetType.IMAGE,
+                    file_path=f"static/images/{image_doc.get('name', '')}"
                 )
                 primary_question_assets.append(asset)
                 continue
-
-            # Check if it's Audio
             audio_doc = db_helpers.get_asset_document_by_id(asset_id, "Audio")
             if audio_doc:
                 asset = FileAsset(
-                    uuid=asset_id,
-                    name=audio_doc.get("name", ""),
-                    asset_type=AssetType.AUDIO,
-                    file_path=f"static/audio/{audio_doc.get('name', '')}" # Construct path
+                    uuid=asset_id, name=audio_doc.get("name", ""), asset_type=AssetType.AUDIO,
+                    file_path=f"static/audio/{audio_doc.get('name', '')}"
                 )
                 primary_question_assets.append(asset)
         
-        # --- Fetch Primary Explanation Assets (from 'images' field) ---
         primary_explanation_assets = []
         for asset_id in question_doc.get("images", {}).get("explanation", []):
-            # Check if it's an Image
             image_doc = db_helpers.get_asset_document_by_id(asset_id, "Images")
             if image_doc:
                 asset = FileAsset(
-                    uuid=asset_id,
-                    name=image_doc.get("name", ""),
-                    asset_type=AssetType.IMAGE,
+                    uuid=asset_id, name=image_doc.get("name", ""), asset_type=AssetType.IMAGE,
                     file_path=f"static/images/{image_doc.get('name', '')}"
                 )
                 primary_explanation_assets.append(asset)
                 continue
-
-            # Check if it's Audio
             audio_doc = db_helpers.get_asset_document_by_id(asset_id, "Audio")
             if audio_doc:
                 asset = FileAsset(
-                    uuid=asset_id,
-                    name=audio_doc.get("name", ""),
-                    asset_type=AssetType.AUDIO,
+                    uuid=asset_id, name=audio_doc.get("name", ""), asset_type=AssetType.AUDIO,
                     file_path=f"static/audio/{audio_doc.get('name', '')}"
                 )
                 primary_explanation_assets.append(asset) 
 
-        # --- Create the Question Model ---
-        question_model = Question(
+        return Question(
             id=question_doc["_id"],
             name=question_doc.get("name", ""),
             source=question_doc.get("source", ""),
             tags=question_doc.get("tags", []),
             choices=[Choice(**c) for c in question_doc.get("choices", [])],
-            
-            # Populate raw HTML fields
             raw_question_html=question_doc.get("question", ""),
             raw_explanation_html=question_doc.get("explanation", ""),
-            
-            # Populate primary asset fields
             primary_question_assets=primary_question_assets,
             primary_explanation_assets=primary_explanation_assets,
         )
 
-        return question_model
+    def _inject_resizing_script(self, html_content: str) -> str:
+        """Injects the JavaScript required for iframe height communication."""
+        height_reporting_script = """
+        <script>
+            const sendHeight = () => {
+                const height = document.body.scrollHeight + 20;
+                window.parent.postMessage({'type': 'documedica:iframe-height', 'height': height}, '*');
+            };
+            window.addEventListener('load', sendHeight);
+            window.addEventListener('resize', sendHeight);
+            new ResizeObserver(sendHeight).observe(document.body);
+        </script>
+        """
+        return html_content + height_reporting_script
 
     def _hydrate_html(self, raw_html: str, inline_assets: list, start_index: int) -> str:
         """
-        Recursively finds all asset placeholders (in <a> and <img> tags),
-        replaces them, and populates the inline_assets list.
+        Recursively finds asset placeholders, populates the inline_assets list,
+        and replaces placeholders with appropriate content or links.
         """
         if not raw_html:
             return ""
 
-        # --- PATTERN 1: For <a> tags, e.g., <a href="[[...]]">text</a> ---
-        # This pattern replaces the entire link with an annotated span.
-        link_pattern = re.compile(
-            r'<a[^>]*href="\[\[(.*?)\]\]"[^>]*>(.*?)</a>',
-            re.DOTALL
-        )
-        
-        # --- PATTERN 2: For <img>, <audio>, <video> tags, e.g., <img src="[[...]]"> ---
-        # This pattern replaces the src attribute with a Base64 data URI.
+        link_pattern = re.compile(r'<a[^>]*href="\[\[(.*?)\]\]"[^>]*>(.*?)</a>', re.DOTALL)
         media_pattern = re.compile(r'src="\[\[(.*?)\]\]"(?=[^>]*>)')
-
         current_asset_index = start_index
 
         def replace_link_and_collect(match):
             nonlocal current_asset_index
-            asset_id = match.group(1)
-            original_text = match.group(2).strip()
+            asset_id, original_text = match.group(1), match.group(2).strip()
             asset_type = db_helpers.get_asset_type_from_db(asset_id)
-            
             asset_object = None
-            
-            # --- THIS IS THE NEW, UNIVERSAL LOGIC ---
-            if not asset_type:
-                return original_text # Asset type not found, return plain text
+
+            if not asset_type: return original_text
 
             if asset_type in [AssetType.IMAGE, AssetType.AUDIO, AssetType.VIDEO]:
                 collection_name = f"{asset_type.value.capitalize()}s"
@@ -135,8 +114,12 @@ class QuestionService:
             elif asset_type in [AssetType.PAGE, AssetType.TABLE]:
                 html_content = db_helpers.get_content_asset_html(asset_id, asset_type)
                 if html_content:
-                    # RECURSIVE CALL: process the nested HTML
                     processed_nested_html = self._hydrate_html(html_content, inline_assets, len(inline_assets))
+                    
+                    # --- CRITICAL CHANGE: Only inject script for PAGE assets ---
+                    if asset_type == AssetType.PAGE:
+                        processed_nested_html = self._inject_resizing_script(processed_nested_html)
+
                     asset_object = ContentAsset(
                         uuid=asset_id, name=original_text, asset_type=asset_type,
                         html_content=processed_nested_html,
@@ -145,112 +128,59 @@ class QuestionService:
 
             if asset_object:
                 inline_assets.append(asset_object)
-                replacement_html = (
-                    f'<span style="color: #80bfff; text-decoration: underline; cursor: pointer;">'
-                    f'{original_text}<sup>[{current_asset_index + 1}]</sup></span>'
-                )
+                replacement_html = f'<span style="color: #80bfff; text-decoration: underline; cursor: pointer;">{original_text}<sup>[{current_asset_index + 1}]</sup></span>'
                 current_asset_index += 1
                 return replacement_html
             
-            return original_text # Fallback to plain text if asset not found
+            return original_text
 
         def replace_media_src(match):
             asset_id = match.group(1)
             asset_type = db_helpers.get_asset_type_from_db(asset_id)
-
             if asset_type in [AssetType.IMAGE, AssetType.AUDIO, AssetType.VIDEO]:
                 collection_name = f"{asset_type.value.capitalize()}s"
                 doc = db_helpers.get_asset_document_by_id(asset_id, collection_name)
                 if doc:
                     file_name = doc.get('name', '')
                     if file_name:
-                        # Include the correct subdirectory in the static URL
-                        asset_type_plural = f"{asset_type.value}s"  # e.g., "images"
+                        asset_type_plural = f"{asset_type.value}s"
                         static_url = f"/app/static/{asset_type_plural}/{file_name}"
                         return f'src="{static_url}"'
-                    else:
-                        return 'src=""' # Return empty src if no filename
-            return 'src=""' # Fallback for unknown assets
+            return 'src=""'
 
-        # Perform hydration in two passes
         processed_html = link_pattern.sub(replace_link_and_collect, raw_html)
         final_html = media_pattern.sub(replace_media_src, processed_html)
-        
-        # Remove height:100% from img tags to prevent CSS conflict with iframe sizing
-        final_html = final_html.replace('height:100%', '')
-        
-        return final_html
+        return final_html.replace('height:100%', '')
 
     def get_question(self, question_id: str) -> Question | None:
-        """
-        Public method to get the fully processed and hydrated question.
-        """
         question = self._fetch_raw_question_by_id(question_id)
-        if not question:
-            return None
+        if not question: return None
         
         all_inline_assets = []
         question.processed_question_html = self._hydrate_html(question.raw_question_html, all_inline_assets, 0)
         question.processed_explanation_html = self._hydrate_html(question.raw_explanation_html, all_inline_assets, len(all_inline_assets))
-        
         question.inline_assets = all_inline_assets
         return question
 
     def toggle_favorite(self, question_id: str) -> bool:
-        """
-        Toggles the favorite status of a question.
-        Returns the new favorite status.
-        """
-        # Get current status
         question_doc = db_client.get_collection("Questions").find_one({"_id": question_id})
-        if not question_doc:
-            return False
-        
-        current_status = question_doc.get("difficult", False)
-        new_status = not current_status
-        
-        # Update the status
+        if not question_doc: return False
+        new_status = not question_doc.get("difficult", False)
         db_helpers.set_favorite_status(question_id, new_status)
-        
-        # Clear cache to ensure fresh data on next load
         self._fetch_raw_question_by_id.clear()
-        
         return new_status
 
     def toggle_done(self, question_id: str) -> bool:
-        """
-        Toggles the done status of a question.
-        Returns the new done status.
-        """
-        # Get current status
         question_doc = db_client.get_collection("Questions").find_one({"_id": question_id})
-        if not question_doc:
-            return False
-        
-        current_status = question_doc.get("flagged", False)
-        new_status = not current_status
-        
-        # Update the status
+        if not question_doc: return False
+        new_status = not question_doc.get("flagged", False)
         db_helpers.set_done_status(question_id, new_status)
-        
-        # Clear cache to ensure fresh data on next load
         self._fetch_raw_question_by_id.clear()
-        
         return new_status
 
     def get_question_status(self, question_id: str) -> dict:
-        """
-        Gets the current favorite and done status of a question.
-        Returns a dict with 'is_favorite' and 'is_done' keys.
-        """
         question_doc = db_client.get_collection("Questions").find_one({"_id": question_id})
-        if not question_doc:
-            return {"is_favorite": False, "is_done": False}
-        
-        return {
-            "is_favorite": question_doc.get("difficult", False),
-            "is_done": question_doc.get("flagged", False)
-        }
+        if not question_doc: return {"is_favorite": False, "is_done": False}
+        return {"is_favorite": question_doc.get("difficult", False), "is_done": question_doc.get("flagged", False)}
 
-# Instantiate a singleton of the service for the app to use
 question_service = QuestionService()

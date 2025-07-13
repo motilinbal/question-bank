@@ -23,3 +23,4 @@ static/
 assets/
 
 docs/file_corruption.md
+main_backup.py
