@@ -577,7 +577,7 @@ def display_question_detail():
                         st.session_state.asset_to_show = asset.uuid
                         st.rerun()
 
-    # --- MODAL DISPLAY LOGIC (Corrected for Asynchronous Height Update) ---
+    # --- MODAL DISPLAY LOGIC (DIAGNOSTIC TEST) ---
     if st.session_state.asset_to_show:
         asset_id_to_show = st.session_state.asset_to_show
         asset = next((a for a in question.inline_assets if a.uuid == asset_id_to_show), None)
@@ -588,35 +588,24 @@ def display_question_detail():
                 st.markdown(f"#### Viewing: {asset.link_text}")
                 
                 if asset.asset_type == AssetType.PAGE:
-                    # This listener component is the key. It's invisible (height=0).
-                    # When the iframe sends a message, this component sets its return
-                    # value, which triggers a Streamlit script rerun.
+                    # STEP 1: Create a simple listener that just logs to the console.
+                    # This lets us verify if the message is being received at all.
                     listener_html = """
                     <script>
                     window.addEventListener("message", (event) => {
                         if (event.data.type === 'documedica:iframe-height') {
-                            Streamlit.setComponentValue(event.data.height);
+                            console.log('PARENT PAGE RECEIVED MESSAGE:', event.data);
                         }
                     });
                     </script>
                     """
-                    js_height = components.html(listener_html, height=0)
+                    components.html(listener_html, height=0)
 
-                    # On the first run, js_height is None.
-                    # After the iframe loads, it sends a message, and on the *next*
-                    # script rerun, js_height will have a value.
-                    # We update our session state only when we receive a new value.
-                    if js_height is not None and isinstance(js_height, (int, float)):
-                        st.session_state.iframe_height = int(js_height)
-
-                    # We ALWAYS render the component using the height stored in session_state.
-                    # This ensures that after the second run, the component uses the
-                    # correct height that was received from the iframe.
-                    components.html(
-                        asset.html_content, 
-                        height=st.session_state.iframe_height, 
-                        scrolling=False  # Set to False as it should now be correctly sized
-                    )
+                    # STEP 2: For this test only, we will hardcode a large height.
+                    # This ensures the content has room to render and send the correct
+                    # scrollHeight value. It isolates the communication test from the rendering logic.
+                    test_height = 1200
+                    components.html(asset.html_content, height=test_height, scrolling=True)
 
                 elif asset.asset_type == AssetType.TABLE:
                     # Tables have a fixed, known height.
