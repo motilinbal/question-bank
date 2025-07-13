@@ -588,24 +588,9 @@ def display_question_detail():
                 st.markdown(f"#### Viewing: {asset.link_text}")
                 
                 if asset.asset_type == AssetType.PAGE:
-                    # STEP 1: Create a simple listener that just logs to the console.
-                    # This lets us verify if the message is being received at all.
-                    listener_html = """
-                    <script>
-                    window.addEventListener("message", (event) => {
-                        if (event.data.type === 'documedica:iframe-height') {
-                            console.log('PARENT PAGE RECEIVED MESSAGE:', event.data);
-                        }
-                    });
-                    </script>
-                    """
-                    components.html(listener_html, height=0)
-
-                    # STEP 2: For this test only, we will hardcode a large height.
-                    # This ensures the content has room to render and send the correct
-                    # scrollHeight value. It isolates the communication test from the rendering logic.
-                    test_height = 1200
-                    components.html(asset.html_content, height=test_height, scrolling=True)
+                    # Temporary fallback: use a large fixed height to avoid truncation
+                    # This is not the final solution, but ensures content is visible
+                    components.html(asset.html_content, height=1200, scrolling=False)
 
                 elif asset.asset_type == AssetType.TABLE:
                     # Tables have a fixed, known height.
@@ -619,7 +604,6 @@ def display_question_detail():
                 if st.button("Close Viewer", key=f"close_asset_{asset_id_to_show}"):
                     # Reset state when closing the viewer
                     st.session_state.asset_to_show = None
-                    st.session_state.iframe_height = 400 # Reset to default
                     st.rerun()
 
 

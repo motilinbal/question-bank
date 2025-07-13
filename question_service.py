@@ -67,20 +67,6 @@ class QuestionService:
             primary_explanation_assets=primary_explanation_assets,
         )
 
-    def _inject_resizing_script(self, html_content: str) -> str:
-        """Injects the JavaScript required for iframe height communication."""
-        height_reporting_script = """
-        <script>
-            const sendHeight = () => {
-                const height = document.body.scrollHeight + 20;
-                window.parent.postMessage({'type': 'documedica:iframe-height', 'height': height}, '*');
-            };
-            window.addEventListener('load', sendHeight);
-            window.addEventListener('resize', sendHeight);
-            new ResizeObserver(sendHeight).observe(document.body);
-        </script>
-        """
-        return html_content + height_reporting_script
 
     def _hydrate_html(self, raw_html: str, inline_assets: list, start_index: int) -> str:
         """
@@ -116,9 +102,6 @@ class QuestionService:
                 if html_content:
                     processed_nested_html = self._hydrate_html(html_content, inline_assets, len(inline_assets))
                     
-                    # --- CRITICAL CHANGE: Only inject script for PAGE assets ---
-                    if asset_type == AssetType.PAGE:
-                        processed_nested_html = self._inject_resizing_script(processed_nested_html)
 
                     asset_object = ContentAsset(
                         uuid=asset_id, name=original_text, asset_type=asset_type,
