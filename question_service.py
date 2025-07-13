@@ -176,6 +176,9 @@ class QuestionService:
         processed_html = link_pattern.sub(replace_link_and_collect, raw_html)
         final_html = media_pattern.sub(replace_media_src, processed_html)
         
+        # Remove height:100% from img tags to prevent CSS conflict with iframe sizing
+        final_html = final_html.replace('height:100%', '')
+        
         return final_html
 
     def get_question(self, question_id: str) -> Question | None:
