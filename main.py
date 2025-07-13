@@ -13,8 +13,9 @@ import textwrap
 st.set_page_config(
     page_title="DocuMedica Question Bank",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
 )
+
 
 # --- Question Function ---
 @st.cache_data(show_spinner="Fetching question...")
@@ -22,17 +23,18 @@ def get_cached_question(question_id):
     """Retrieves and caches the fully processed question object."""
     return question_service.get_question(question_id)
 
+
 # --- Helper Functions ---
 @st.cache_data  # Cache the data so we don't query on every rerun
 def get_filter_options():
     """Fetches unique sources and tags from the database for filter population."""
     print("Fetching filter options from DB...")
-    
+
     # Check if database connection is available
     if db_client.db is None:
         st.error("❌ Database connection failed. Please check your MongoDB connection.")
         return [], []
-    
+
     try:
         # Get sources and tags directly from database
         sources = db_client.get_collection("Questions").distinct("source")
@@ -41,6 +43,25 @@ def get_filter_options():
     except Exception as e:
         st.error(f"❌ Error fetching filter options: {e}")
         return [], []
+
+
+def get_random_question_id(query):
+    """Fetches a single random question ID matching the filter criteria."""
+    if db_client.db is None:
+        st.error("Database connection failed.")
+        return None
+
+    pipeline = [{"$match": query}, {"$sample": {"size": 1}}, {"$project": {"_id": 1}}]
+
+    try:
+        result = list(db_client.get_collection("Questions").aggregate(pipeline))
+        if result:
+            return result[0]["_id"]
+        else:
+            return None
+    except Exception as e:
+        st.error(f"Error fetching random question: {e}")
+        return None
 
 
 # --- Session State Initialization ---
@@ -59,7 +80,7 @@ if "page_size" not in st.session_state:
 
 # --- New Session State for Interactive Question Experience ---
 if "font_size" not in st.session_state:
-    st.session_state.font_size = 18  # Default font size in pixels
+    st.session_state.font_size = 24  # Default font size in pixels
 if "selected_answer" not in st.session_state:
     st.session_state.selected_answer = None  # Tracks which choice the user selects
 if "submitted" not in st.session_state:
@@ -73,7 +94,9 @@ if "asset_to_show" not in st.session_state:
 if "current_question" not in st.session_state:
     st.session_state.current_question = None  # Will hold the full question object
 if "current_question_id" not in st.session_state:
-    st.session_state.current_question_id = None  # Tracks the ID of the question being displayed
+    st.session_state.current_question_id = (
+        None  # Tracks the ID of the question being displayed
+    )
 if "iframe_height" not in st.session_state:
     st.session_state.iframe_height = 400  # Default height for iframe
 
@@ -89,14 +112,48 @@ with st.sidebar:
     show_favorites_only = st.checkbox("Show Favorites Only ⭐")
     show_done_only = st.checkbox("Show Done Only 🔖")
 
+    st.markdown("---")
+
+    if st.button("Surprise Me", use_container_width=True, type="secondary"):
+        # Build the current query again, just as we do for the list view
+        mongo_query = {}
+        if search_query:
+            search_terms = search_query.split()
+            formatted_search = " ".join(['"' + term + '"' for term in search_terms])
+            mongo_query["$text"] = {"$search": formatted_search}
+        if selected_sources:
+            mongo_query["source"] = {"$in": selected_sources}
+        if selected_tags:
+            mongo_query["tags"] = {"$in": selected_tags}
+        if show_favorites_only:
+            mongo_query["difficult"] = True
+        if show_done_only:
+            mongo_query["flagged"] = True
+        else:
+            mongo_query["flagged"] = {"$ne": True}
+
+        # Fetch a random question ID using the current filters
+        random_id = get_random_question_id(mongo_query)
+        if random_id:
+            # If we found a question, set it as the selected one and rerun
+            st.session_state.selected_question_id = random_id
+            # Reset the question state for the new question
+            st.session_state.submitted = False
+            st.session_state.selected_answer = None
+            st.session_state.show_explanation = False
+            st.rerun()
+        else:
+            # If no questions match the filters, show a toast message
+            st.toast("No questions match the current filters!", icon="🤷‍♀️")
+
     # --- Actions Section (only show when viewing a question) ---
     if st.session_state.selected_question_id is not None:
         st.markdown("---")
         st.subheader("⚙️ Actions")
-        
+
         # Get current question for button states
         question = question_service.get_question(st.session_state.selected_question_id)
-        
+
         # Back to List button
         if st.button("⬅️ Back to List", use_container_width=True):
             st.session_state.selected_question_id = None
@@ -105,19 +162,21 @@ with st.sidebar:
             st.session_state.selected_answer = None
             st.session_state.show_explanation = False
             st.rerun()
-        
+
         if question:
             # Get current status
-            status = question_service.get_question_status(st.session_state.selected_question_id)
+            status = question_service.get_question_status(
+                st.session_state.selected_question_id
+            )
             is_favorite = status["is_favorite"]
             is_done = status["is_done"]
-            
+
             # Favorite button
             fav_text = "Unfavorite ⭐" if is_favorite else "Favorite ⭐"
             if st.button(fav_text, use_container_width=True, key="toggle_favorite"):
                 question_service.toggle_favorite(st.session_state.selected_question_id)
                 st.rerun()
-            
+
             # Done button
             done_text = "Mark as Not Done ✅" if is_done else "Mark as Done ✅"
             if st.button(done_text, use_container_width=True, key="toggle_done"):
@@ -136,6 +195,7 @@ with st.sidebar:
             - Use Actions panel to favorite or mark questions
         """
         )
+
 
 # --- Custom CSS for Professional Design ---
 def load_custom_css():
@@ -281,6 +341,7 @@ def load_custom_css():
     """
     st.markdown(css, unsafe_allow_html=True)
 
+
 # --- Main Content Area (Remove title when viewing question) ---
 if st.session_state.selected_question_id is None:
     st.title("🏥 DocuMedica Question Bank")
@@ -315,7 +376,7 @@ def display_question_list():
             mongo_query["$or"] = [
                 {"question": {"$regex": current_query["text"], "$options": "i"}},
                 {"explanation": {"$regex": current_query["text"], "$options": "i"}},
-                {"name": {"$regex": current_query["text"], "$options": "i"}}
+                {"name": {"$regex": current_query["text"], "$options": "i"}},
             ]
         if "source" in current_query:
             mongo_query["source"] = current_query["source"]
@@ -324,57 +385,73 @@ def display_question_list():
         # Handle favorite filter
         if "is_favorite" in current_query:
             mongo_query["difficult"] = True
-        
+
         # Handle done filter - by default exclude done questions unless specifically requested
         if "is_done" in current_query:
             mongo_query["flagged"] = True
         else:
             # By default, exclude done questions (flagged=True)
             mongo_query["flagged"] = {"$ne": True}
-        
+
         # Get total count
         total_count = db_client.get_collection("Questions").count_documents(mongo_query)
-        
+
         # Calculate pagination
         skip = (st.session_state.current_page - 1) * st.session_state.page_size
-        total_pages = (total_count + st.session_state.page_size - 1) // st.session_state.page_size
-        
+        total_pages = (
+            total_count + st.session_state.page_size - 1
+        ) // st.session_state.page_size
+
         # Get paginated results
-        cursor = db_client.get_collection("Questions").find(mongo_query).skip(skip).limit(st.session_state.page_size)
+        cursor = (
+            db_client.get_collection("Questions")
+            .find(mongo_query)
+            .skip(skip)
+            .limit(st.session_state.page_size)
+        )
         questions = []
-        
+
         for doc in cursor:
             # Create a simple question object for the list view
-            question_obj = type('Question', (), {
-                'question_id': doc['_id'],
-                'source': doc.get('source', ''),
-                'tags': doc.get('tags', []),
-                'is_favorite': doc.get('difficult', False),
-                'difficult': doc.get('difficult', False)
-            })()
+            question_obj = type(
+                "Question",
+                (),
+                {
+                    "question_id": doc["_id"],
+                    "source": doc.get("source", ""),
+                    "tags": doc.get("tags", []),
+                    "is_favorite": doc.get("difficult", False),
+                    "difficult": doc.get("difficult", False),
+                },
+            )()
             questions.append(question_obj)
-        
+
         st.session_state.question_list = questions
         st.session_state.total_questions = total_count
-        
+
     except Exception as e:
         st.error(f"Error fetching questions: {e}")
         return
 
     # Display results header with pagination info
     start_idx = (st.session_state.current_page - 1) * st.session_state.page_size + 1
-    end_idx = min(st.session_state.current_page * st.session_state.page_size, st.session_state.total_questions)
-    
+    end_idx = min(
+        st.session_state.current_page * st.session_state.page_size,
+        st.session_state.total_questions,
+    )
+
     col1, col2 = st.columns([3, 1])
     with col1:
-        st.subheader(f"Questions {start_idx:,}-{end_idx:,} of {st.session_state.total_questions:,}")
+        st.subheader(
+            f"Questions {start_idx:,}-{end_idx:,} of {st.session_state.total_questions:,}"
+        )
     with col2:
         # Page size selector
         new_page_size = st.selectbox(
-            "Per page:", 
-            options=[10, 20, 50, 100], 
+            "Per page:",
+            options=[10, 20, 50, 100],
             index=[10, 20, 50, 100].index(st.session_state.page_size),
-            key="page_size_selector"
+            key="page_size_selector",
         )
         if new_page_size != st.session_state.page_size:
             st.session_state.page_size = new_page_size
@@ -416,33 +493,48 @@ def display_question_list():
 def display_pagination_controls(total_pages, position="top"):
     """Display pagination controls with unique keys"""
     col1, col2, col3, col4, col5 = st.columns([1, 1, 2, 1, 1])
-    
+
     with col1:
-        if st.button("⏮️ First", disabled=(st.session_state.current_page <= 1), key=f"first_{position}"):
+        if st.button(
+            "⏮️ First",
+            disabled=(st.session_state.current_page <= 1),
+            key=f"first_{position}",
+        ):
             st.session_state.current_page = 1
             st.rerun()
-    
+
     with col2:
-        if st.button("⬅️ Prev", disabled=(st.session_state.current_page <= 1), key=f"prev_{position}"):
+        if st.button(
+            "⬅️ Prev",
+            disabled=(st.session_state.current_page <= 1),
+            key=f"prev_{position}",
+        ):
             st.session_state.current_page -= 1
             st.rerun()
-    
+
     with col3:
-        st.markdown(f"<div style='text-align: center; padding: 8px;'>Page {st.session_state.current_page} of {total_pages}</div>", unsafe_allow_html=True)
-    
+        st.markdown(
+            f"<div style='text-align: center; padding: 8px;'>Page {st.session_state.current_page} of {total_pages}</div>",
+            unsafe_allow_html=True,
+        )
+
     with col4:
-        if st.button("Next ➡️", disabled=(st.session_state.current_page >= total_pages), key=f"next_{position}"):
+        if st.button(
+            "Next ➡️",
+            disabled=(st.session_state.current_page >= total_pages),
+            key=f"next_{position}",
+        ):
             st.session_state.current_page += 1
             st.rerun()
-    
+
     with col5:
-        if st.button("Last ⏭️", disabled=(st.session_state.current_page >= total_pages), key=f"last_{position}"):
+        if st.button(
+            "Last ⏭️",
+            disabled=(st.session_state.current_page >= total_pages),
+            key=f"last_{position}",
+        ):
             st.session_state.current_page = total_pages
             st.rerun()
-
-
-
-
 
 
 def calculate_dynamic_height(html_content: str) -> int:
@@ -451,7 +543,7 @@ def calculate_dynamic_height(html_content: str) -> int:
     height of its embedded background image.
     """
     if not html_content:
-        return 400 # Default height
+        return 400  # Default height
 
     # Find the UUID of the background image from the <img> tag
     image_uuid_match = re.search(r'src="\[\[(.*?)\]\]"', html_content)
@@ -460,7 +552,7 @@ def calculate_dynamic_height(html_content: str) -> int:
         return 800
 
     image_uuid = image_uuid_match.group(1)
-    
+
     # Get the actual dimensions of the image from our helper function
     dimensions = get_image_dimensions(image_uuid)
     if not dimensions:
@@ -468,15 +560,16 @@ def calculate_dynamic_height(html_content: str) -> int:
         return 800
 
     # The height is the second element of the (width, height) tuple
-    image_height = dimensions[1] 
-    
+    image_height = dimensions[1]
+
     # Return the image's original height plus a small buffer for any tooltips
     # that might be positioned near the bottom edge.
     return image_height + 50
 
+
 def display_question_detail():
     load_custom_css()
-    
+
     q_id = st.session_state.selected_question_id
     question = get_cached_question(q_id)
 
@@ -493,7 +586,7 @@ def display_question_detail():
             st.rerun()
     with plus_col:
         if st.button("➕", help="Increase font size", use_container_width=True):
-            st.session_state.font_size = min(st.session_state.font_size + 2, 28)
+            st.session_state.font_size = min(st.session_state.font_size + 2, 42)
             st.rerun()
 
     # --- Display Question Header ---
@@ -502,7 +595,10 @@ def display_question_detail():
     st.divider()
 
     # --- RENDER THE QUESTION BODY ---
-    st.markdown(f"<div style='font-size: {st.session_state.font_size}px;'>{question.processed_question_html}</div>", unsafe_allow_html=True)
+    st.markdown(
+        f"<div style='font-size: {st.session_state.font_size}px;'>{question.processed_question_html}</div>",
+        unsafe_allow_html=True,
+    )
     if question.primary_question_assets:
         st.write("**Associated Media:**")
         for asset in question.primary_question_assets:
@@ -513,38 +609,53 @@ def display_question_detail():
 
     # --- INTERACTIVE CHOICES UI ---
     if question.choices:
-        if not st.session_state.get('submitted', False):
+        if not st.session_state.get("submitted", False):
             choice_options = []
             choice_mapping = {}
             for i, choice in enumerate(question.choices):
-                clean_choice_text = BeautifulSoup(choice.text, 'html.parser').get_text(strip=True)
+                clean_choice_text = BeautifulSoup(choice.text, "html.parser").get_text(
+                    strip=True
+                )
                 choice_display = f"{choice.id}. {clean_choice_text}"
                 choice_options.append(choice_display)
                 choice_mapping[choice_display] = choice
-            
+
             selected_choice_text = st.radio(
-                "Choices", options=choice_options, key=f"choices_{q_id}", label_visibility="collapsed"
+                "Choices",
+                options=choice_options,
+                key=f"choices_{q_id}",
+                label_visibility="collapsed",
             )
-            
+
             if selected_choice_text:
                 st.session_state.selected_answer = choice_mapping[selected_choice_text]
         else:
             for choice in question.choices:
-                clean_choice_text = BeautifulSoup(choice.text, 'html.parser').get_text(strip=True)
+                clean_choice_text = BeautifulSoup(choice.text, "html.parser").get_text(
+                    strip=True
+                )
                 border_color, border_width = "#ccc", "1px"
                 if choice.is_correct:
                     border_color, border_width = "#28a745", "2px"
-                elif st.session_state.selected_answer and choice.id == st.session_state.selected_answer.id:
+                elif (
+                    st.session_state.selected_answer
+                    and choice.id == st.session_state.selected_answer.id
+                ):
                     border_color, border_width = "#dc3545", "2px"
-                
-                st.markdown(f"""
+
+                st.markdown(
+                    f"""
                 <div style=\"border: {border_width} solid {border_color}; border-radius: 10px; padding: 1rem 1.5rem; margin: 0.5rem 0;\">
                     {choice.id}. {clean_choice_text}
                 </div>
-                """, unsafe_allow_html=True)
+                """,
+                    unsafe_allow_html=True,
+                )
 
         # --- Submit Button ---
-        if not st.session_state.get('submitted', False) and st.session_state.get('selected_answer'):
+        if not st.session_state.get("submitted", False) and st.session_state.get(
+            "selected_answer"
+        ):
             col1, col2, col3 = st.columns([2, 1, 2])
             with col2:
                 if st.button("Submit", type="primary", use_container_width=True):
@@ -553,10 +664,13 @@ def display_question_detail():
                     st.rerun()
 
     # --- EXPLANATION AND ASSET REFERENCE DESK ---
-    if st.session_state.get('show_explanation', False):
+    if st.session_state.get("show_explanation", False):
         st.divider()
         st.markdown("### Explanation")
-        st.markdown(f"<div style='font-size: {st.session_state.font_size-2}px;'>{question.processed_explanation_html}</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div style='font-size: {st.session_state.font_size-2}px;'>{question.processed_explanation_html}</div>",
+            unsafe_allow_html=True,
+        )
         if question.primary_explanation_assets:
             st.write("**Associated Media:**")
             for asset in question.primary_explanation_assets:
@@ -573,20 +687,24 @@ def display_question_detail():
                 with ref_cols[0]:
                     st.markdown(f"**[{i+1}]**")
                 with ref_cols[1]:
-                    if st.button(asset.link_text, key=asset.uuid, use_container_width=True):
+                    if st.button(
+                        asset.link_text, key=asset.uuid, use_container_width=True
+                    ):
                         st.session_state.asset_to_show = asset.uuid
                         st.rerun()
 
     # --- MODAL DISPLAY LOGIC (DIAGNOSTIC TEST) ---
     if st.session_state.asset_to_show:
         asset_id_to_show = st.session_state.asset_to_show
-        asset = next((a for a in question.inline_assets if a.uuid == asset_id_to_show), None)
-        
+        asset = next(
+            (a for a in question.inline_assets if a.uuid == asset_id_to_show), None
+        )
+
         if asset:
             st.divider()
             with st.container():
                 st.markdown(f"#### Viewing: {asset.link_text}")
-                
+
                 if asset.asset_type == AssetType.PAGE:
                     # Temporary fallback: use a large fixed height to avoid truncation
                     # This is not the final solution, but ensures content is visible
@@ -596,10 +714,13 @@ def display_question_detail():
                     # Tables have a fixed, known height.
                     components.html(asset.html_content, height=600, scrolling=True)
 
-                else: # Handle standard Image, Audio, Video
-                    if asset.asset_type == AssetType.IMAGE: st.image(asset.file_path, use_column_width=True)
-                    elif asset.asset_type == AssetType.AUDIO: st.audio(asset.file_path)
-                    elif asset.asset_type == AssetType.VIDEO: st.video(asset.file_path)
+                else:  # Handle standard Image, Audio, Video
+                    if asset.asset_type == AssetType.IMAGE:
+                        st.image(asset.file_path, use_column_width=True)
+                    elif asset.asset_type == AssetType.AUDIO:
+                        st.audio(asset.file_path)
+                    elif asset.asset_type == AssetType.VIDEO:
+                        st.video(asset.file_path)
 
                 if st.button("Close Viewer", key=f"close_asset_{asset_id_to_show}"):
                     # Reset state when closing the viewer
