@@ -2,8 +2,7 @@
 
 import streamlit as st
 import re
-import base64
-import mimetypes
+import os
 from typing import Union
 from database import db_client
 import database_helpers as db_helpers
@@ -30,7 +29,7 @@ class QuestionService:
                     uuid=asset_id,
                     name=image_doc.get("name", ""),
                     asset_type=AssetType.IMAGE,
-                    file_path=f"assets/images/{image_doc.get('name', '')}" # Construct path
+                    file_path=f"static/images/{image_doc.get('name', '')}" # Construct path
                 )
                 primary_question_assets.append(asset)
                 continue
@@ -42,7 +41,7 @@ class QuestionService:
                     uuid=asset_id,
                     name=audio_doc.get("name", ""),
                     asset_type=AssetType.AUDIO,
-                    file_path=f"assets/audio/{audio_doc.get('name', '')}" # Construct path
+                    file_path=f"static/audio/{audio_doc.get('name', '')}" # Construct path
                 )
                 primary_question_assets.append(asset)
         
@@ -56,7 +55,7 @@ class QuestionService:
                     uuid=asset_id,
                     name=image_doc.get("name", ""),
                     asset_type=AssetType.IMAGE,
-                    file_path=f"assets/images/{image_doc.get('name', '')}"
+                    file_path=f"static/images/{image_doc.get('name', '')}"
                 )
                 primary_explanation_assets.append(asset)
                 continue
@@ -68,7 +67,7 @@ class QuestionService:
                     uuid=asset_id,
                     name=audio_doc.get("name", ""),
                     asset_type=AssetType.AUDIO,
-                    file_path=f"assets/audio/{audio_doc.get('name', '')}"
+                    file_path=f"static/audio/{audio_doc.get('name', '')}"
                 )
                 primary_explanation_assets.append(asset) 
 
@@ -130,7 +129,7 @@ class QuestionService:
                 if doc:
                     asset_object = FileAsset(
                         uuid=asset_id, name=doc.get("name", ""), asset_type=asset_type,
-                        file_path=f"assets/{asset_type.value}s/{doc.get('name', '')}",
+                        file_path=f"static/{asset_type.value}s/{doc.get('name', '')}",
                         link_text=original_text
                     )
             elif asset_type in [AssetType.PAGE, AssetType.TABLE]:
@@ -163,16 +162,14 @@ class QuestionService:
                 collection_name = f"{asset_type.value.capitalize()}s"
                 doc = db_helpers.get_asset_document_by_id(asset_id, collection_name)
                 if doc:
-                    file_path = f"assets/{asset_type.value}s/{doc.get('name', '')}"
-                    try:
-                        with open(file_path, "rb") as f:
-                            data = f.read()
-                        base64_data = base64.b64encode(data).decode('utf-8')
-                        mime_type = mimetypes.guess_type(file_path)[0] or "application/octet-stream"
-                        # Return the full src attribute with the data URI
-                        return f'src="data:{mime_type};base64,{base64_data}"'
-                    except FileNotFoundError:
-                        return 'src=""' # Return empty src if file not found
+                    file_name = doc.get('name', '')
+                    if file_name:
+                        # Include the correct subdirectory in the static URL
+                        asset_type_plural = f"{asset_type.value}s"  # e.g., "images"
+                        static_url = f"/app/static/{asset_type_plural}/{file_name}"
+                        return f'src="{static_url}"'
+                    else:
+                        return 'src=""' # Return empty src if no filename
             return 'src=""' # Fallback for unknown assets
 
         # Perform hydration in two passes

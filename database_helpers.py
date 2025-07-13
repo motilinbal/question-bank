@@ -58,7 +58,7 @@ def get_image_dimensions(image_id: str) -> tuple[int, int] | None:
     if not image_doc:
         return None
     
-    file_path = f"assets/images/{image_doc.get('name', '')}"
+    file_path = f"static/images/{image_doc.get('name', '')}"
     
     if not os.path.exists(file_path):
         return None

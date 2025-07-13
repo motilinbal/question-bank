@@ -21,3 +21,5 @@ __pycache__/
 # assets folder
 static/
 assets/
+
+docs/file_corruption.md

@@ -586,9 +586,8 @@ def display_question_detail():
                 st.markdown(f"#### Viewing: {asset.link_text}")
                 
                 if asset.asset_type in [AssetType.PAGE, AssetType.TABLE]:
-                    # Calculate the height dynamically
-                    dynamic_height = calculate_dynamic_height(asset.html_content)
-                    components.html(asset.html_content, height=dynamic_height)
+                    # Let Streamlit automatically determine the height
+                    components.html(asset.html_content)
                 else: # Image, Audio, Video
                     if asset.asset_type == AssetType.IMAGE: st.image(asset.file_path, use_column_width=True)
                     elif asset.asset_type == AssetType.AUDIO: st.audio(asset.file_path)

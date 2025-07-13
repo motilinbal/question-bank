@@ -17,10 +17,10 @@ VIDEOS_COLLECTION = "Videos"
 SOURCES_COLLECTION = "sources" # This might not be needed
 
 # --- Asset Paths ---
-ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets")
-IMAGES_DIR = os.path.join(ASSETS_DIR, "images")
-VIDEOS_DIR = os.path.join(ASSETS_DIR, "videos")
-AUDIO_DIR = os.path.join(ASSETS_DIR, "audio")
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+IMAGES_DIR = os.path.join(STATIC_DIR, "images")
+VIDEOS_DIR = os.path.join(STATIC_DIR, "videos")
+AUDIO_DIR = os.path.join(STATIC_DIR, "audio")
 
 # IMAGES_DIR = '/home/motilin/Documents/Medical/Docs/Mongo_Banks/Media_test/Images'
 # AUDIO_DIR = '/home/motilin/Documents/Medical/Docs/Mongo_Banks/Media_test/Audio'
