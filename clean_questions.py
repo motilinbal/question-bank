@@ -1,8 +1,16 @@
 #!/usr/bin/env python3
 """
-Script to extract and display clean text from a single medical question.
-This script connects to the MongoDB database and extracts question data
-without making any changes to the database.
+Script to clean question text and update the 'text' field in the Questions collection.
+This script connects to the MongoDB database, cleans HTML content from questions,
+choices, and explanations, and updates the 'text' field with the cleaned text.
+
+SAFETY NOTE: This script WILL update the database. Before running:
+1. Backup your database
+2. Test with a small number of questions first (set num_questions = 10)
+3. Only when confident, set num_questions = None to process all questions
+
+To temporarily disable database updates, comment out the line:
+    success = update_question_text_field(question_id, formatted_text)
 """
 
 import sys
@@ -112,23 +120,45 @@ def format_question_for_output(clean_data: Dict[str, Any]) -> str:
     Returns:
         str: Formatted question text
     """
-    formatted_text = f"        Question: {clean_data['question']}\n\n"
-    formatted_text += "        Options:\n"
+    formatted_text = f"Question: {clean_data['question']}\n\n"
+    formatted_text += "Options:\n"
     
     # Sort choices by ID to ensure consistent order (A, B, C, D, etc.)
     sorted_choices = sorted(clean_data['choices'], key=lambda x: x['id'])
     
     for choice in sorted_choices:
-        formatted_text += f"        {choice['id']}) {choice['text']}\n"
+        formatted_text += f"{choice['id']}) {choice['text']}\n"
     
-    formatted_text += f"\n        Explanation: {clean_data['explanation']}"
+    formatted_text += f"\nExplanation: {clean_data['explanation']}"
     
     return formatted_text
 
+def update_question_text_field(question_id: str, cleaned_text: str) -> bool:
+    """
+    Update the text field of a question document in the database.
+    
+    Args:
+        question_id (str): The ID of the question to update
+        cleaned_text (str): The cleaned text to set in the text field
+        
+    Returns:
+        bool: True if update was successful, False otherwise
+    """
+    try:
+        success = db_client.update_document(
+            collection_name="Questions",
+            document_id=question_id,
+            updates={"text": cleaned_text}
+        )
+        return success
+    except Exception as e:
+        print(f"❌ Error updating question {question_id}: {e}")
+        return False
+
 def main():
     """Main function to connect to database and process multiple questions."""
-    # Number of questions to fetch
-    num_questions = 5000
+    # Number of questions to fetch (set to None to process all questions)
+    num_questions = None  # Set to a number like 5000 to limit, or None for all questions
     output_file = "cleaned_questions.txt"
     
     print("Connecting to database...")
@@ -140,32 +170,65 @@ def main():
         print("❌ Failed to connect to Questions collection")
         return
     
-    # Get multiple question documents
-    print(f"Fetching {num_questions} questions from the database...")
-    question_docs = questions_collection.find().limit(num_questions)
+    # Get question documents
+    if num_questions is None:
+        print("Fetching ALL questions from the database...")
+        question_docs = questions_collection.find()
+    else:
+        print(f"Fetching {num_questions} questions from the database...")
+        question_docs = questions_collection.find().limit(num_questions)
     
-    # Convert cursor to list to check if we got any results
-    question_docs_list = list(question_docs)
-    
-    if not question_docs_list:
-        print("❌ No questions found in the database")
-        return
-    
-    print(f"✅ Successfully fetched {len(question_docs_list)} questions")
-    
-    # Process all question documents
+    # Process all question documents by iterating directly over the cursor
     print("\n--- Processing Question Data ---")
     cleaned_questions = []
     
-    for i, question_doc in enumerate(question_docs_list):
-        if (i + 1) % 100 == 0:
-            print(f"Processed {i + 1}/{len(question_docs_list)} questions...")
+    # Track database update statistics
+    update_stats = {
+        "success": 0,
+        "failed": 0
+    }
+    failed_questions = []
+    
+    # Count the questions as we process them
+    count = 0
+    
+    for question_doc in question_docs:
+        count += 1
+        
+        if count % 100 == 0:
+            if num_questions is None:
+                print(f"Processed {count} questions...")
+            else:
+                print(f"Processed {count}/{num_questions} questions...")
         
         clean_data = process_question_document(question_doc)
-        cleaned_questions.append(clean_data)
+        # cleaned_questions.append(clean_data)
+        
+        # Format the question for the text field
+        formatted_text = format_question_for_output(clean_data)
+        
+        # Update the database
+        question_id = question_doc.get("_id", "")
+        if question_id:
+            success = update_question_text_field(question_id, formatted_text)
+            if success:
+                update_stats["success"] += 1
+            else:
+                update_stats["failed"] += 1
+                failed_questions.append(question_id)
+        
+        # If we've reached the limit, stop processing
+        if num_questions is not None and count >= num_questions:
+            break
+    
+    if count == 0:
+        print("❌ No questions found in the database")
+        return
+    
+    print(f"✅ Successfully processed {count} questions")
     
     # Save the cleaned questions to a file in the specified format
-    print(f"\n--- Saving {len(cleaned_questions)} cleaned questions to {output_file} ---")
+    print(f"\n--- Saving cleaned questions to {output_file} ---")
     try:
         with open(output_file, 'w', encoding='utf-8') as f:
             for i, clean_data in enumerate(cleaned_questions):
@@ -184,6 +247,11 @@ def main():
         print(f"❌ Failed to save questions to file: {e}")
         return
     
+    # Display update statistics
+    print(f"\n--- Database Update Statistics ---")
+    print(f"Successful updates: {update_stats['success']}")
+    print(f"Failed updates: {update_stats['failed']}")
+    
     # Display a sample of the clean data
     if cleaned_questions:
         sample = cleaned_questions[0]
@@ -195,8 +263,8 @@ def main():
         print("\n--- Formatted Question Text ---")
         print(format_question_for_output(sample))
     
-    print(f"\n✅ Script completed successfully. Processed {len(cleaned_questions)} questions and saved to {output_file}.")
-    print("No changes were made to the database.")
+    print(f"\n✅ Script completed successfully.")
+    print(f"Processed {count} questions, updated {update_stats['success']} text fields in the database.")
 
 if __name__ == "__main__":
     main()
