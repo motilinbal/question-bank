@@ -1,0 +1,2101 @@
+{
+  "taxonomy": [
+    {
+      "_id": "foundational_disciplines",
+      "display_name": "Foundational Disciplines",
+      "facet": "discipline",
+      "parent_id": null,
+      "children_ids": [
+        "physiology",
+        "pharmacology",
+        "pathology",
+        "microbiology",
+        "anatomy_embryology",
+        "immunology",
+        "biostatistics_epidemiology",
+        "behavioral_health",
+        "biochemistry"
+      ]
+    },
+    {
+      "_id": "physiology",
+      "display_name": "Physiology",
+      "facet": "discipline",
+      "parent_id": "foundational_disciplines",
+      "children_ids": [
+        "phys_cardiovascular",
+        "phys_renal",
+        "phys_gastrointestinal",
+        "phys_endocrine",
+        "phys_neurophysiology",
+        "phys_cellular",
+        "phys_hematologic"
+      ]
+    },
+    {
+      "_id": "phys_cardiovascular",
+      "display_name": "Cardiovascular Physiology",
+      "facet": "subdiscipline",
+      "parent_id": "physiology",
+      "children_ids": [
+        "phys_baroreceptor_reflex",
+        "phys_raas",
+        "phys_starling_forces"
+      ]
+    },
+    {
+      "_id": "phys_baroreceptor_reflex",
+      "display_name": "Baroreceptor Reflex",
+      "facet": "pathophysiology",
+      "parent_id": "phys_cardiovascular",
+      "children_ids": []
+    },
+    {
+      "_id": "phys_raas",
+      "display_name": "Renin-Angiotensin-Aldosterone System (RAAS)",
+      "facet": "pathophysiology",
+      "parent_id": "phys_cardiovascular",
+      "children_ids": []
+    },
+    {
+      "_id": "phys_starling_forces",
+      "display_name": "Starling Forces",
+      "facet": "pathophysiology",
+      "parent_id": "phys_cardiovascular",
+      "children_ids": []
+    },
+    {
+      "_id": "phys_renal",
+      "display_name": "Renal Physiology",
+      "facet": "subdiscipline",
+      "parent_id": "physiology",
+      "children_ids": []
+    },
+    {
+      "_id": "phys_gastrointestinal",
+      "display_name": "Gastrointestinal Physiology",
+      "facet": "subdiscipline",
+      "parent_id": "physiology",
+      "children_ids": [
+        "phys_gastric_acid_secretion"
+      ]
+    },
+    {
+      "_id": "phys_gastric_acid_secretion",
+      "display_name": "Gastric Acid Secretion",
+      "facet": "pathophysiology",
+      "parent_id": "phys_gastrointestinal",
+      "children_ids": []
+    },
+    {
+      "_id": "phys_endocrine",
+      "display_name": "Endocrine Physiology",
+      "facet": "subdiscipline",
+      "parent_id": "physiology",
+      "children_ids": [
+        "phys_hpg_axis"
+      ]
+    },
+    {
+      "_id": "phys_hpg_axis",
+      "display_name": "Hypothalamic-Pituitary-Gonadal Axis",
+      "facet": "pathophysiology",
+      "parent_id": "phys_endocrine",
+      "children_ids": []
+    },
+    {
+      "_id": "phys_neurophysiology",
+      "display_name": "Neurophysiology",
+      "facet": "subdiscipline",
+      "parent_id": "physiology",
+      "children_ids": [
+        "phys_action_potential"
+      ]
+    },
+    {
+      "_id": "phys_action_potential",
+      "display_name": "Action Potentials",
+      "facet": "pathophysiology",
+      "parent_id": "phys_neurophysiology",
+      "children_ids": [
+        "phys_pacemaker_action_potential",
+        "phys_saltatory_conduction"
+      ]
+    },
+    {
+      "_id": "phys_pacemaker_action_potential",
+      "display_name": "Pacemaker Action Potential",
+      "facet": "pathophysiology",
+      "parent_id": "phys_action_potential",
+      "children_ids": []
+    },
+    {
+      "_id": "phys_saltatory_conduction",
+      "display_name": "Saltatory Conduction",
+      "facet": "pathophysiology",
+      "parent_id": "phys_action_potential",
+      "children_ids": []
+    },
+    {
+      "_id": "phys_cellular",
+      "display_name": "Cellular Physiology",
+      "facet": "subdiscipline",
+      "parent_id": "physiology",
+      "children_ids": [
+        "phys_signal_transduction"
+      ]
+    },
+    {
+      "_id": "phys_signal_transduction",
+      "display_name": "Signal Transduction",
+      "facet": "pathophysiology",
+      "parent_id": "phys_cellular",
+      "children_ids": [
+        "phys_jak_stat_pathway",
+        "phys_ip3_signaling"
+      ]
+    },
+    {
+      "_id": "phys_jak_stat_pathway",
+      "display_name": "JAK-STAT Pathway",
+      "facet": "pathophysiology",
+      "parent_id": "phys_signal_transduction",
+      "children_ids": []
+    },
+    {
+      "_id": "phys_ip3_signaling",
+      "display_name": "IP3 Signaling",
+      "facet": "pathophysiology",
+      "parent_id": "phys_signal_transduction",
+      "children_ids": []
+    },
+    {
+      "_id": "phys_hematologic",
+      "display_name": "Hematologic Physiology",
+      "facet": "subdiscipline",
+      "parent_id": "physiology",
+      "children_ids": [
+        "phys_coagulation_cascade",
+        "phys_oxygen_hemoglobin_dissociation"
+      ]
+    },
+    {
+      "_id": "phys_coagulation_cascade",
+      "display_name": "Coagulation Cascade",
+      "facet": "pathophysiology",
+      "parent_id": "phys_hematologic",
+      "children_ids": []
+    },
+    {
+      "_id": "phys_oxygen_hemoglobin_dissociation",
+      "display_name": "Oxygen-Hemoglobin Dissociation Curve",
+      "facet": "pathophysiology",
+      "parent_id": "phys_hematologic",
+      "children_ids": []
+    },
+    {
+      "_id": "pharmacology",
+      "display_name": "Pharmacology",
+      "facet": "discipline",
+      "parent_id": "foundational_disciplines",
+      "children_ids": [
+        "pharma_cardiovascular",
+        "pharma_gastrointestinal",
+        "pharma_antimicrobials",
+        "pharma_autonomic",
+        "pharma_anesthetics",
+        "pharma_endocrine",
+        "pharma_antineoplastic",
+        "pharma_immunomodulators"
+      ]
+    },
+    {
+      "_id": "pharma_cardiovascular",
+      "display_name": "Cardiovascular Therapeutics",
+      "facet": "therapeutic_area",
+      "parent_id": "pharmacology",
+      "children_ids": [
+        "pharma_antihypertensives",
+        "pharma_vasoactive_agents",
+        "pharma_antiarrhythmics"
+      ]
+    },
+    {
+      "_id": "pharma_antihypertensives",
+      "display_name": "Antihypertensives",
+      "facet": "therapeutic_class",
+      "parent_id": "pharma_cardiovascular",
+      "children_ids": [
+        "pharma_raas_inhibitors",
+        "pharma_calcium_channel_blockers",
+        "pharma_beta_blockers",
+        "pharma_diuretics",
+        "pharma_alpha_blockers"
+      ]
+    },
+    {
+      "_id": "pharma_raas_inhibitors",
+      "display_name": "RAAS Inhibitors",
+      "facet": "drug_class",
+      "parent_id": "pharma_antihypertensives",
+      "children_ids": [
+        "pharma_ace_inhibitors",
+        "pharma_arbs"
+      ]
+    },
+    {
+      "_id": "pharma_ace_inhibitors",
+      "display_name": "ACE Inhibitors",
+      "facet": "drug_class",
+      "parent_id": "pharma_raas_inhibitors",
+      "children_ids": []
+    },
+    {
+      "_id": "pharma_arbs",
+      "display_name": "Angiotensin II Receptor Blockers (ARBs)",
+      "facet": "drug_class",
+      "parent_id": "pharma_raas_inhibitors",
+      "children_ids": []
+    },
+    {
+      "_id": "pharma_calcium_channel_blockers",
+      "display_name": "Calcium Channel Blockers",
+      "facet": "drug_class",
+      "parent_id": "pharma_antihypertensives",
+      "children_ids": []
+    },
+    {
+      "_id": "pharma_beta_blockers",
+      "display_name": "Beta Blockers",
+      "facet": "drug_class",
+      "parent_id": "pharma_antihypertensives",
+      "children_ids": []
+    },
+    {
+      "_id": "pharma_diuretics",
+      "display_name": "Diuretics",
+      "facet": "drug_class",
+      "parent_id": "pharma_antihypertensives",
+      "children_ids": []
+    },
+    {
+      "_id": "pharma_alpha_blockers",
+      "display_name": "Alpha Blockers",
+      "facet": "drug_class",
+      "parent_id": "pharma_antihypertensives",
+      "children_ids": []
+    },
+    {
+      "_id": "pharma_vasoactive_agents",
+      "display_name": "Vasoactive Agents",
+      "facet": "therapeutic_class",
+      "parent_id": "pharma_cardiovascular",
+      "children_ids": [
+        "pharma_vasodilators",
+        "pharma_vasoconstrictors"
+      ]
+    },
+    {
+      "_id": "pharma_vasodilators",
+      "display_name": "Vasodilators",
+      "facet": "drug_class",
+      "parent_id": "pharma_vasoactive_agents",
+      "children_ids": [
+        "pharma_nitrates"
+      ]
+    },
+    {
+      "_id": "pharma_nitrates",
+      "display_name": "Nitrates",
+      "facet": "drug_class",
+      "parent_id": "pharma_vasodilators",
+      "children_ids": []
+    },
+    {
+      "_id": "pharma_vasoconstrictors",
+      "display_name": "Vasoconstrictors",
+      "facet": "drug_class",
+      "parent_id": "pharma_vasoactive_agents",
+      "children_ids": [
+        "pharma_ergot_alkaloids"
+      ]
+    },
+    {
+      "_id": "pharma_ergot_alkaloids",
+      "display_name": "Ergot Alkaloids",
+      "facet": "drug_class",
+      "parent_id": "pharma_vasoconstrictors",
+      "children_ids": []
+    },
+    {
+      "_id": "pharma_antiarrhythmics",
+      "display_name": "Antiarrhythmics",
+      "facet": "therapeutic_class",
+      "parent_id": "pharma_cardiovascular",
+      "children_ids": []
+    },
+    {
+      "_id": "pharma_gastrointestinal",
+      "display_name": "Gastrointestinal Therapeutics",
+      "facet": "therapeutic_area",
+      "parent_id": "pharmacology",
+      "children_ids": [
+        "pharma_acid_suppression"
+      ]
+    },
+    {
+      "_id": "pharma_acid_suppression",
+      "display_name": "Acid-Suppressing Agents",
+      "facet": "therapeutic_class",
+      "parent_id": "pharma_gastrointestinal",
+      "children_ids": [
+        "pharma_ppis",
+        "pharma_h2_antagonists",
+        "pharma_antacids"
+      ]
+    },
+    {
+      "_id": "pharma_ppis",
+      "display_name": "Proton Pump Inhibitors (PPIs)",
+      "facet": "drug_class",
+      "parent_id": "pharma_acid_suppression",
+      "children_ids": []
+    },
+    {
+      "_id": "pharma_h2_antagonists",
+      "display_name": "H2 Receptor Antagonists",
+      "facet": "drug_class",
+      "parent_id": "pharma_acid_suppression",
+      "children_ids": []
+    },
+    {
+      "_id": "pharma_antacids",
+      "display_name": "Antacids",
+      "facet": "drug_class",
+      "parent_id": "pharma_acid_suppression",
+      "children_ids": []
+    },
+    {
+      "_id": "pharma_antimicrobials",
+      "display_name": "Antimicrobials",
+      "facet": "therapeutic_area",
+      "parent_id": "pharmacology",
+      "children_ids": [
+        "pharma_antifungals"
+      ]
+    },
+    {
+      "_id": "pharma_antifungals",
+      "display_name": "Antifungals",
+      "facet": "drug_class",
+      "parent_id": "pharma_antimicrobials",
+      "children_ids": []
+    },
+    {
+      "_id": "pharma_autonomic",
+      "display_name": "Autonomic Drugs",
+      "facet": "therapeutic_area",
+      "parent_id": "pharmacology",
+      "children_ids": [
+        "pharma_sympathomimetics"
+      ]
+    },
+    {
+      "_id": "pharma_sympathomimetics",
+      "display_name": "Sympathomimetics",
+      "facet": "drug_class",
+      "parent_id": "pharma_autonomic",
+      "children_ids": []
+    },
+    {
+      "_id": "pharma_anesthetics",
+      "display_name": "Anesthetics",
+      "facet": "therapeutic_area",
+      "parent_id": "pharmacology",
+      "children_ids": [
+        "pharma_local_anesthetics"
+      ]
+    },
+    {
+      "_id": "pharma_local_anesthetics",
+      "display_name": "Local Anesthetics",
+      "facet": "drug_class",
+      "parent_id": "pharma_anesthetics",
+      "children_ids": []
+    },
+    {
+      "_id": "pharma_endocrine",
+      "display_name": "Endocrine Therapeutics",
+      "facet": "therapeutic_area",
+      "parent_id": "pharmacology",
+      "children_ids": [
+        "pharma_gnrh_agonists",
+        "pharma_antithyroid_drugs"
+      ]
+    },
+    {
+      "_id": "pharma_gnrh_agonists",
+      "display_name": "GnRH Agonists",
+      "facet": "drug_class",
+      "parent_id": "pharma_endocrine",
+      "children_ids": []
+    },
+    {
+      "_id": "pharma_antithyroid_drugs",
+      "display_name": "Antithyroid Drugs",
+      "facet": "drug_class",
+      "parent_id": "pharma_endocrine",
+      "children_ids": []
+    },
+    {
+      "_id": "pharma_antineoplastic",
+      "display_name": "Antineoplastic Agents",
+      "facet": "therapeutic_area",
+      "parent_id": "pharmacology",
+      "children_ids": []
+    },
+    {
+      "_id": "pharma_immunomodulators",
+      "display_name": "Immunomodulators",
+      "facet": "therapeutic_area",
+      "parent_id": "pharmacology",
+      "children_ids": [
+        "pharma_corticosteroids"
+      ]
+    },
+    {
+      "_id": "pharma_corticosteroids",
+      "display_name": "Corticosteroids",
+      "facet": "drug_class",
+      "parent_id": "pharma_immunomodulators",
+      "children_ids": []
+    },
+    {
+      "_id": "pathology",
+      "display_name": "Pathology",
+      "facet": "discipline",
+      "parent_id": "foundational_disciplines",
+      "children_ids": [
+        "path_histopathology",
+        "path_necrosis"
+      ]
+    },
+    {
+      "_id": "path_histopathology",
+      "display_name": "Histopathology",
+      "facet": "subdiscipline",
+      "parent_id": "pathology",
+      "children_ids": [
+        "path_demyelination",
+        "path_granulomatous_inflammation",
+        "path_hyperkeratosis",
+        "path_g_cell_hyperplasia",
+        "path_amyloid_deposition"
+      ]
+    },
+    {
+      "_id": "path_demyelination",
+      "display_name": "Demyelination",
+      "facet": "histology",
+      "parent_id": "path_histopathology",
+      "children_ids": []
+    },
+    {
+      "_id": "path_granulomatous_inflammation",
+      "display_name": "Granulomatous Inflammation",
+      "facet": "histology",
+      "parent_id": "path_histopathology",
+      "children_ids": []
+    },
+    {
+      "_id": "path_hyperkeratosis",
+      "display_name": "Hyperkeratosis",
+      "facet": "histology",
+      "parent_id": "path_histopathology",
+      "children_ids": []
+    },
+    {
+      "_id": "path_g_cell_hyperplasia",
+      "display_name": "G Cell Hyperplasia",
+      "facet": "histology",
+      "parent_id": "path_histopathology",
+      "children_ids": []
+    },
+    {
+      "_id": "path_amyloid_deposition",
+      "display_name": "Amyloid Deposition",
+      "facet": "histology",
+      "parent_id": "path_histopathology",
+      "children_ids": []
+    },
+    {
+      "_id": "path_necrosis",
+      "display_name": "Necrosis",
+      "facet": "subdiscipline",
+      "parent_id": "pathology",
+      "children_ids": [
+        "path_liquefactive_necrosis"
+      ]
+    },
+    {
+      "_id": "path_liquefactive_necrosis",
+      "display_name": "Liquefactive Necrosis",
+      "facet": "histology",
+      "parent_id": "path_necrosis",
+      "children_ids": []
+    },
+    {
+      "_id": "microbiology",
+      "display_name": "Microbiology",
+      "facet": "discipline",
+      "parent_id": "foundational_disciplines",
+      "children_ids": [
+        "micro_parasitology",
+        "micro_virology",
+        "micro_bacteriology",
+        "micro_mycology"
+      ]
+    },
+    {
+      "_id": "micro_parasitology",
+      "display_name": "Parasitology",
+      "facet": "subdiscipline",
+      "parent_id": "microbiology",
+      "children_ids": []
+    },
+    {
+      "_id": "micro_virology",
+      "display_name": "Virology",
+      "facet": "subdiscipline",
+      "parent_id": "microbiology",
+      "children_ids": [
+        "micro_ebv",
+        "micro_viral_replication"
+      ]
+    },
+    {
+      "_id": "micro_ebv",
+      "display_name": "Epstein-Barr Virus (EBV)",
+      "facet": "organism",
+      "parent_id": "micro_virology",
+      "children_ids": []
+    },
+    {
+      "_id": "micro_viral_replication",
+      "display_name": "Viral Replication",
+      "facet": "pathophysiology",
+      "parent_id": "micro_virology",
+      "children_ids": [
+        "micro_positive_sense_rna_viruses"
+      ]
+    },
+    {
+      "_id": "micro_positive_sense_rna_viruses",
+      "display_name": "Positive-Sense ssRNA Viruses",
+      "facet": "organism_class",
+      "parent_id": "micro_viral_replication",
+      "children_ids": []
+    },
+    {
+      "_id": "micro_bacteriology",
+      "display_name": "Bacteriology",
+      "facet": "subdiscipline",
+      "parent_id": "microbiology",
+      "children_ids": [
+        "micro_pseudomonas_aeruginosa"
+      ]
+    },
+    {
+      "_id": "micro_pseudomonas_aeruginosa",
+      "display_name": "Pseudomonas aeruginosa",
+      "facet": "organism",
+      "parent_id": "micro_bacteriology",
+      "children_ids": []
+    },
+    {
+      "_id": "micro_mycology",
+      "display_name": "Mycology",
+      "facet": "subdiscipline",
+      "parent_id": "microbiology",
+      "children_ids": [
+        "micro_aspergillus"
+      ]
+    },
+    {
+      "_id": "micro_aspergillus",
+      "display_name": "Aspergillus",
+      "facet": "organism",
+      "parent_id": "micro_mycology",
+      "children_ids": []
+    },
+    {
+      "_id": "anatomy_embryology",
+      "display_name": "Anatomy & Embryology",
+      "facet": "discipline",
+      "parent_id": "foundational_disciplines",
+      "children_ids": [
+        "anatomy",
+        "embryology"
+      ]
+    },
+    {
+      "_id": "anatomy",
+      "display_name": "Anatomy",
+      "facet": "subdiscipline",
+      "parent_id": "anatomy_embryology",
+      "children_ids": [
+        "anat_brachial_plexus",
+        "anat_peripheral_nerves"
+      ]
+    },
+    {
+      "_id": "anat_brachial_plexus",
+      "display_name": "Brachial Plexus",
+      "facet": "anatomy",
+      "parent_id": "anatomy",
+      "children_ids": []
+    },
+    {
+      "_id": "anat_peripheral_nerves",
+      "display_name": "Peripheral Nerves",
+      "facet": "anatomy",
+      "parent_id": "anatomy",
+      "children_ids": [
+        "anat_long_thoracic_nerve"
+      ]
+    },
+    {
+      "_id": "anat_long_thoracic_nerve",
+      "display_name": "Long Thoracic Nerve",
+      "facet": "anatomy",
+      "parent_id": "anat_peripheral_nerves",
+      "children_ids": []
+    },
+    {
+      "_id": "embryology",
+      "display_name": "Embryology",
+      "facet": "subdiscipline",
+      "parent_id": "anatomy_embryology",
+      "children_ids": [
+        "embryo_renal_development"
+      ]
+    },
+    {
+      "_id": "embryo_renal_development",
+      "display_name": "Renal Development",
+      "facet": "embryology",
+      "parent_id": "embryology",
+      "children_ids": [
+        "embryo_ureteric_bud",
+        "embryo_metanephric_mesenchyme"
+      ]
+    },
+    {
+      "_id": "embryo_ureteric_bud",
+      "display_name": "Ureteric Bud",
+      "facet": "embryology",
+      "parent_id": "embryo_renal_development",
+      "children_ids": []
+    },
+    {
+      "_id": "embryo_metanephric_mesenchyme",
+      "display_name": "Metanephric Mesenchyme",
+      "facet": "embryology",
+      "parent_id": "embryo_renal_development",
+      "children_ids": []
+    },
+    {
+      "_id": "immunology",
+      "display_name": "Immunology",
+      "facet": "discipline",
+      "parent_id": "foundational_disciplines",
+      "children_ids": [
+        "immuno_hypersensitivity_reactions"
+      ]
+    },
+    {
+      "_id": "immuno_hypersensitivity_reactions",
+      "display_name": "Hypersensitivity Reactions",
+      "facet": "pathophysiology",
+      "parent_id": "immunology",
+      "children_ids": [
+        "immuno_type1_hypersensitivity"
+      ]
+    },
+    {
+      "_id": "immuno_type1_hypersensitivity",
+      "display_name": "Type I Hypersensitivity",
+      "facet": "pathophysiology",
+      "parent_id": "immuno_hypersensitivity_reactions",
+      "children_ids": []
+    },
+    {
+      "_id": "biostatistics_epidemiology",
+      "display_name": "Biostatistics & Epidemiology",
+      "facet": "discipline",
+      "parent_id": "foundational_disciplines",
+      "children_ids": [
+        "biostat_diagnostic_test_metrics"
+      ]
+    },
+    {
+      "_id": "biostat_diagnostic_test_metrics",
+      "display_name": "Diagnostic Test Metrics",
+      "facet": "biostatistics",
+      "parent_id": "biostatistics_epidemiology",
+      "children_ids": [
+        "biostat_sensitivity",
+        "biostat_specificity",
+        "biostat_ppv",
+        "biostat_npv"
+      ]
+    },
+    {
+      "_id": "biostat_sensitivity",
+      "display_name": "Sensitivity",
+      "facet": "biostatistics",
+      "parent_id": "biostat_diagnostic_test_metrics",
+      "children_ids": []
+    },
+    {
+      "_id": "biostat_specificity",
+      "display_name": "Specificity",
+      "facet": "biostatistics",
+      "parent_id": "biostat_diagnostic_test_metrics",
+      "children_ids": []
+    },
+    {
+      "_id": "biostat_ppv",
+      "display_name": "Positive Predictive Value (PPV)",
+      "facet": "biostatistics",
+      "parent_id": "biostat_diagnostic_test_metrics",
+      "children_ids": []
+    },
+    {
+      "_id": "biostat_npv",
+      "display_name": "Negative Predictive Value (NPV)",
+      "facet": "biostatistics",
+      "parent_id": "biostat_diagnostic_test_metrics",
+      "children_ids": []
+    },
+    {
+      "_id": "behavioral_health",
+      "display_name": "Behavioral Health",
+      "facet": "discipline",
+      "parent_id": "foundational_disciplines",
+      "children_ids": [
+        "behav_human_sexuality",
+        "behav_psychiatry"
+      ]
+    },
+    {
+      "_id": "behav_human_sexuality",
+      "display_name": "Human Sexuality",
+      "facet": "subdiscipline",
+      "parent_id": "behavioral_health",
+      "children_ids": [
+        "behav_adolescent_development"
+      ]
+    },
+    {
+      "_id": "behav_adolescent_development",
+      "display_name": "Adolescent Development",
+      "facet": "subdiscipline",
+      "parent_id": "behav_human_sexuality",
+      "children_ids": []
+    },
+    {
+      "_id": "behav_psychiatry",
+      "display_name": "Psychiatry",
+      "facet": "subdiscipline",
+      "parent_id": "behavioral_health",
+      "children_ids": [
+        "psych_psychotic_disorders",
+        "psych_eating_disorders"
+      ]
+    },
+    {
+      "_id": "psych_psychotic_disorders",
+      "display_name": "Psychotic Disorders",
+      "facet": "condition_category",
+      "parent_id": "behav_psychiatry",
+      "children_ids": [
+        "psych_schizophrenia",
+        "psych_schizophreniform_disorder"
+      ]
+    },
+    {
+      "_id": "psych_schizophrenia",
+      "display_name": "Schizophrenia",
+      "facet": "condition",
+      "parent_id": "psych_psychotic_disorders",
+      "children_ids": []
+    },
+    {
+      "_id": "psych_schizophreniform_disorder",
+      "display_name": "Schizophreniform Disorder",
+      "facet": "condition",
+      "parent_id": "psych_psychotic_disorders",
+      "children_ids": []
+    },
+    {
+      "_id": "psych_eating_disorders",
+      "display_name": "Eating Disorders",
+      "facet": "condition_category",
+      "parent_id": "behav_psychiatry",
+      "children_ids": [
+        "psych_anorexia_nervosa"
+      ]
+    },
+    {
+      "_id": "psych_anorexia_nervosa",
+      "display_name": "Anorexia Nervosa",
+      "facet": "condition",
+      "parent_id": "psych_eating_disorders",
+      "children_ids": []
+    },
+    {
+      "_id": "biochemistry",
+      "display_name": "Biochemistry",
+      "facet": "discipline",
+      "parent_id": "foundational_disciplines",
+      "children_ids": [
+        "biochem_metabolism"
+      ]
+    },
+    {
+      "_id": "biochem_metabolism",
+      "display_name": "Metabolism",
+      "facet": "subdiscipline",
+      "parent_id": "biochemistry",
+      "children_ids": [
+        "biochem_amino_acid_metabolism"
+      ]
+    },
+    {
+      "_id": "biochem_amino_acid_metabolism",
+      "display_name": "Amino Acid Metabolism",
+      "facet": "pathophysiology",
+      "parent_id": "biochem_metabolism",
+      "children_ids": [
+        "biochem_phenylketonuria"
+      ]
+    },
+    {
+      "_id": "biochem_phenylketonuria",
+      "display_name": "Phenylketonuria (PKU)",
+      "facet": "condition",
+      "parent_id": "biochem_amino_acid_metabolism",
+      "children_ids": []
+    },
+    {
+      "_id": "organ_systems",
+      "display_name": "Organ Systems",
+      "facet": "system",
+      "parent_id": null,
+      "children_ids": [
+        "cardiovascular_system",
+        "dermatology",
+        "endocrine_system",
+        "gastrointestinal_system",
+        "hematology_oncology",
+        "infectious_disease",
+        "musculoskeletal_system",
+        "neurologic_system",
+        "renal_urinary_system",
+        "reproductive_system",
+        "respiratory_system",
+        "rheumatology_vasculitis"
+      ]
+    },
+    {
+      "_id": "cardiovascular_system",
+      "display_name": "Cardiovascular System",
+      "facet": "system",
+      "parent_id": "organ_systems",
+      "children_ids": [
+        "cardio_shock",
+        "cardio_hypertensive_disease",
+        "cardio_ischemic_heart_disease",
+        "cardio_pericardial_disease",
+        "cardio_arrhythmias",
+        "cardio_congenital_heart_disease",
+        "cardio_vascular_disease"
+      ]
+    },
+    {
+      "_id": "cardio_shock",
+      "display_name": "Shock",
+      "facet": "condition",
+      "parent_id": "cardiovascular_system",
+      "children_ids": [
+        "cardio_shock_hypovolemic"
+      ]
+    },
+    {
+      "_id": "cardio_shock_hypovolemic",
+      "display_name": "Hypovolemic Shock",
+      "facet": "subtype",
+      "parent_id": "cardio_shock",
+      "children_ids": []
+    },
+    {
+      "_id": "cardio_hypertensive_disease",
+      "display_name": "Hypertensive Disease",
+      "facet": "condition_category",
+      "parent_id": "cardiovascular_system",
+      "children_ids": [
+        "cardio_hypertension",
+        "cardio_left_ventricular_hypertrophy"
+      ]
+    },
+    {
+      "_id": "cardio_hypertension",
+      "display_name": "Hypertension",
+      "facet": "condition",
+      "parent_id": "cardio_hypertensive_disease",
+      "children_ids": []
+    },
+    {
+      "_id": "cardio_left_ventricular_hypertrophy",
+      "display_name": "Left Ventricular Hypertrophy (LVH)",
+      "facet": "condition",
+      "parent_id": "cardio_hypertensive_disease",
+      "children_ids": []
+    },
+    {
+      "_id": "cardio_ischemic_heart_disease",
+      "display_name": "Ischemic Heart Disease",
+      "facet": "condition_category",
+      "parent_id": "cardiovascular_system",
+      "children_ids": [
+        "cardio_myocardial_infarction"
+      ]
+    },
+    {
+      "_id": "cardio_myocardial_infarction",
+      "display_name": "Myocardial Infarction (MI)",
+      "facet": "condition",
+      "parent_id": "cardio_ischemic_heart_disease",
+      "children_ids": []
+    },
+    {
+      "_id": "cardio_pericardial_disease",
+      "display_name": "Pericardial Disease",
+      "facet": "condition_category",
+      "parent_id": "cardiovascular_system",
+      "children_ids": [
+        "cardio_pericarditis_acute",
+        "cardio_tamponade"
+      ]
+    },
+    {
+      "_id": "cardio_pericarditis_acute",
+      "display_name": "Acute Pericarditis",
+      "facet": "condition",
+      "parent_id": "cardio_pericardial_disease",
+      "children_ids": []
+    },
+    {
+      "_id": "cardio_tamponade",
+      "display_name": "Cardiac Tamponade",
+      "facet": "condition",
+      "parent_id": "cardio_pericardial_disease",
+      "children_ids": []
+    },
+    {
+      "_id": "cardio_arrhythmias",
+      "display_name": "Arrhythmias",
+      "facet": "condition_category",
+      "parent_id": "cardiovascular_system",
+      "children_ids": [
+        "cardio_arrhythmia_afib",
+        "cardio_arrhythmia_vfib"
+      ]
+    },
+    {
+      "_id": "cardio_arrhythmia_afib",
+      "display_name": "Atrial Fibrillation (AFib)",
+      "facet": "condition",
+      "parent_id": "cardio_arrhythmias",
+      "children_ids": []
+    },
+    {
+      "_id": "cardio_arrhythmia_vfib",
+      "display_name": "Ventricular Fibrillation (VFib)",
+      "facet": "condition",
+      "parent_id": "cardio_arrhythmias",
+      "children_ids": []
+    },
+    {
+      "_id": "cardio_congenital_heart_disease",
+      "display_name": "Congenital Heart Disease",
+      "facet": "condition_category",
+      "parent_id": "cardiovascular_system",
+      "children_ids": [
+        "cardio_tgv"
+      ]
+    },
+    {
+      "_id": "cardio_tgv",
+      "display_name": "Transposition of the Great Vessels (TGV)",
+      "facet": "condition",
+      "parent_id": "cardio_congenital_heart_disease",
+      "children_ids": []
+    },
+    {
+      "_id": "cardio_vascular_disease",
+      "display_name": "Vascular Disease",
+      "facet": "condition_category",
+      "parent_id": "cardiovascular_system",
+      "children_ids": [
+        "cardio_pe"
+      ]
+    },
+    {
+      "_id": "cardio_pe",
+      "display_name": "Pulmonary Embolism (PE)",
+      "facet": "condition",
+      "parent_id": "cardio_vascular_disease",
+      "children_ids": []
+    },
+    {
+      "_id": "dermatology",
+      "display_name": "Dermatology",
+      "facet": "system",
+      "parent_id": "organ_systems",
+      "children_ids": [
+        "derm_oral_pathology",
+        "derm_inflammatory_dermatoses"
+      ]
+    },
+    {
+      "_id": "derm_oral_pathology",
+      "display_name": "Oral Pathology",
+      "facet": "condition_category",
+      "parent_id": "dermatology",
+      "children_ids": [
+        "derm_leukoplakia"
+      ]
+    },
+    {
+      "_id": "derm_leukoplakia",
+      "display_name": "Leukoplakia",
+      "facet": "condition",
+      "parent_id": "derm_oral_pathology",
+      "children_ids": []
+    },
+    {
+      "_id": "derm_inflammatory_dermatoses",
+      "display_name": "Inflammatory Dermatoses",
+      "facet": "condition_category",
+      "parent_id": "dermatology",
+      "children_ids": [
+        "derm_atopic_dermatitis"
+      ]
+    },
+    {
+      "_id": "derm_atopic_dermatitis",
+      "display_name": "Atopic Dermatitis (Eczema)",
+      "facet": "condition",
+      "parent_id": "derm_inflammatory_dermatoses",
+      "children_ids": []
+    },
+    {
+      "_id": "endocrine_system",
+      "display_name": "Endocrine System",
+      "facet": "system",
+      "parent_id": "organ_systems",
+      "children_ids": [
+        "endo_diabetes_mellitus",
+        "endo_thyroid_disorders",
+        "endo_adrenal_disorders"
+      ]
+    },
+    {
+      "_id": "endo_diabetes_mellitus",
+      "display_name": "Diabetes Mellitus",
+      "facet": "condition",
+      "parent_id": "endocrine_system",
+      "children_ids": [
+        "endo_type1_dm"
+      ]
+    },
+    {
+      "_id": "endo_type1_dm",
+      "display_name": "Type 1 Diabetes Mellitus",
+      "facet": "subtype",
+      "parent_id": "endo_diabetes_mellitus",
+      "children_ids": []
+    },
+    {
+      "_id": "endo_thyroid_disorders",
+      "display_name": "Thyroid Disorders",
+      "facet": "condition_category",
+      "parent_id": "endocrine_system",
+      "children_ids": [
+        "endo_hypothyroidism",
+        "endo_hyperthyroidism",
+        "endo_thyroid_neoplasms"
+      ]
+    },
+    {
+      "_id": "endo_hypothyroidism",
+      "display_name": "Hypothyroidism",
+      "facet": "condition",
+      "parent_id": "endo_thyroid_disorders",
+      "children_ids": []
+    },
+    {
+      "_id": "endo_hyperthyroidism",
+      "display_name": "Hyperthyroidism",
+      "facet": "condition",
+      "parent_id": "endo_thyroid_disorders",
+      "children_ids": []
+    },
+    {
+      "_id": "endo_thyroid_neoplasms",
+      "display_name": "Thyroid Neoplasms",
+      "facet": "condition_category",
+      "parent_id": "endo_thyroid_disorders",
+      "children_ids": [
+        "endo_medullary_thyroid_carcinoma"
+      ]
+    },
+    {
+      "_id": "endo_medullary_thyroid_carcinoma",
+      "display_name": "Medullary Thyroid Carcinoma",
+      "facet": "condition",
+      "parent_id": "endo_thyroid_neoplasms",
+      "children_ids": []
+    },
+    {
+      "_id": "endo_adrenal_disorders",
+      "display_name": "Adrenal Disorders",
+      "facet": "condition_category",
+      "parent_id": "endocrine_system",
+      "children_ids": [
+        "endo_pheochromocytoma"
+      ]
+    },
+    {
+      "_id": "endo_pheochromocytoma",
+      "display_name": "Pheochromocytoma",
+      "facet": "condition",
+      "parent_id": "endo_adrenal_disorders",
+      "children_ids": []
+    },
+    {
+      "_id": "gastrointestinal_system",
+      "display_name": "Gastrointestinal System",
+      "facet": "system",
+      "parent_id": "organ_systems",
+      "children_ids": [
+        "gi_esophageal_disorders",
+        "gi_gastric_disorders",
+        "gi_hepatosplenic_disorders",
+        "gi_pancreatic_disorders"
+      ]
+    },
+    {
+      "_id": "gi_esophageal_disorders",
+      "display_name": "Esophageal Disorders",
+      "facet": "condition_category",
+      "parent_id": "gastrointestinal_system",
+      "children_ids": [
+        "gi_gerd"
+      ]
+    },
+    {
+      "_id": "gi_gerd",
+      "display_name": "Gastroesophageal Reflux Disease (GERD)",
+      "facet": "condition",
+      "parent_id": "gi_esophageal_disorders",
+      "children_ids": []
+    },
+    {
+      "_id": "gi_gastric_disorders",
+      "display_name": "Gastric Disorders",
+      "facet": "condition_category",
+      "parent_id": "gastrointestinal_system",
+      "children_ids": [
+        "gi_atrophic_gastritis",
+        "gi_gastrinoma"
+      ]
+    },
+    {
+      "_id": "gi_atrophic_gastritis",
+      "display_name": "Atrophic Gastritis",
+      "facet": "condition",
+      "parent_id": "gi_gastric_disorders",
+      "children_ids": [
+        "gi_autoimmune_atrophic_gastritis"
+      ]
+    },
+    {
+      "_id": "gi_autoimmune_atrophic_gastritis",
+      "display_name": "Autoimmune Metaplastic Atrophic Gastritis (AMAG)",
+      "facet": "subtype",
+      "parent_id": "gi_atrophic_gastritis",
+      "children_ids": []
+    },
+    {
+      "_id": "gi_gastrinoma",
+      "display_name": "Gastrinoma (Zollinger-Ellison Syndrome)",
+      "facet": "condition",
+      "parent_id": "gi_gastric_disorders",
+      "children_ids": []
+    },
+    {
+      "_id": "gi_hepatosplenic_disorders",
+      "display_name": "Hepatosplenic Disorders",
+      "facet": "condition_category",
+      "parent_id": "gastrointestinal_system",
+      "children_ids": [
+        "gi_splenic_rupture"
+      ]
+    },
+    {
+      "_id": "gi_splenic_rupture",
+      "display_name": "Splenic Rupture",
+      "facet": "condition",
+      "parent_id": "gi_hepatosplenic_disorders",
+      "children_ids": []
+    },
+    {
+      "_id": "gi_pancreatic_disorders",
+      "display_name": "Pancreatic Disorders",
+      "facet": "condition_category",
+      "parent_id": "gastrointestinal_system",
+      "children_ids": [
+        "gi_acute_pancreatitis"
+      ]
+    },
+    {
+      "_id": "gi_acute_pancreatitis",
+      "display_name": "Acute Pancreatitis",
+      "facet": "condition",
+      "parent_id": "gi_pancreatic_disorders",
+      "children_ids": []
+    },
+    {
+      "_id": "hematology_oncology",
+      "display_name": "Hematology & Oncology",
+      "facet": "system",
+      "parent_id": "organ_systems",
+      "children_ids": [
+        "hemonc_anemias",
+        "hemonc_coagulation_disorders",
+        "hemonc_neoplasms"
+      ]
+    },
+    {
+      "_id": "hemonc_anemias",
+      "display_name": "Anemias",
+      "facet": "condition_category",
+      "parent_id": "hematology_oncology",
+      "children_ids": [
+        "hemonc_microcytic_anemia",
+        "hemonc_macrocytic_anemia"
+      ]
+    },
+    {
+      "_id": "hemonc_microcytic_anemia",
+      "display_name": "Microcytic Anemia",
+      "facet": "condition",
+      "parent_id": "hemonc_anemias",
+      "children_ids": [
+        "hemonc_beta_thalassemia_minor",
+        "hemonc_iron_deficiency_anemia"
+      ]
+    },
+    {
+      "_id": "hemonc_beta_thalassemia_minor",
+      "display_name": "Beta Thalassemia Minor",
+      "facet": "subtype",
+      "parent_id": "hemonc_microcytic_anemia",
+      "children_ids": []
+    },
+    {
+      "_id": "hemonc_iron_deficiency_anemia",
+      "display_name": "Iron Deficiency Anemia",
+      "facet": "subtype",
+      "parent_id": "hemonc_microcytic_anemia",
+      "children_ids": []
+    },
+    {
+      "_id": "hemonc_macrocytic_anemia",
+      "display_name": "Macrocytic Anemia",
+      "facet": "condition",
+      "parent_id": "hemonc_anemias",
+      "children_ids": [
+        "hemonc_pernicious_anemia"
+      ]
+    },
+    {
+      "_id": "hemonc_pernicious_anemia",
+      "display_name": "Pernicious Anemia",
+      "facet": "subtype",
+      "parent_id": "hemonc_macrocytic_anemia",
+      "children_ids": []
+    },
+    {
+      "_id": "hemonc_coagulation_disorders",
+      "display_name": "Coagulation Disorders",
+      "facet": "condition_category",
+      "parent_id": "hematology_oncology",
+      "children_ids": [
+        "hemonc_thrombophilia"
+      ]
+    },
+    {
+      "_id": "hemonc_thrombophilia",
+      "display_name": "Thrombophilia",
+      "facet": "condition",
+      "parent_id": "hemonc_coagulation_disorders",
+      "children_ids": [
+        "hemonc_factor_v_leiden"
+      ]
+    },
+    {
+      "_id": "hemonc_factor_v_leiden",
+      "display_name": "Factor V Leiden",
+      "facet": "subtype",
+      "parent_id": "hemonc_thrombophilia",
+      "children_ids": []
+    },
+    {
+      "_id": "hemonc_neoplasms",
+      "display_name": "Neoplasms",
+      "facet": "condition_category",
+      "parent_id": "hematology_oncology",
+      "children_ids": [
+        "hemonc_breast_cancer",
+        "hemonc_multiple_myeloma"
+      ]
+    },
+    {
+      "_id": "hemonc_breast_cancer",
+      "display_name": "Breast Cancer",
+      "facet": "condition",
+      "parent_id": "hemonc_neoplasms",
+      "children_ids": [
+        "hemonc_paget_disease_breast"
+      ]
+    },
+    {
+      "_id": "hemonc_paget_disease_breast",
+      "display_name": "Paget Disease of the Breast",
+      "facet": "subtype",
+      "parent_id": "hemonc_breast_cancer",
+      "children_ids": []
+    },
+    {
+      "_id": "hemonc_multiple_myeloma",
+      "display_name": "Multiple Myeloma",
+      "facet": "condition",
+      "parent_id": "hemonc_neoplasms",
+      "children_ids": []
+    },
+    {
+      "_id": "infectious_disease",
+      "display_name": "Infectious Disease",
+      "facet": "system",
+      "parent_id": "organ_systems",
+      "children_ids": [
+        "id_bacterial",
+        "id_viral",
+        "id_parasitic",
+        "id_mycological"
+      ]
+    },
+    {
+      "_id": "id_bacterial",
+      "display_name": "Bacterial Infections",
+      "facet": "condition_category",
+      "parent_id": "infectious_disease",
+      "children_ids": [
+        "id_tuberculosis",
+        "id_whipple_disease",
+        "id_malignant_otitis_externa"
+      ]
+    },
+    {
+      "_id": "id_tuberculosis",
+      "display_name": "Tuberculosis (TB)",
+      "facet": "condition",
+      "parent_id": "id_bacterial",
+      "children_ids": []
+    },
+    {
+      "_id": "id_whipple_disease",
+      "display_name": "Whipple Disease",
+      "facet": "condition",
+      "parent_id": "id_bacterial",
+      "children_ids": []
+    },
+    {
+      "_id": "id_malignant_otitis_externa",
+      "display_name": "Malignant Otitis Externa",
+      "facet": "condition",
+      "parent_id": "id_bacterial",
+      "children_ids": []
+    },
+    {
+      "_id": "id_viral",
+      "display_name": "Viral Infections",
+      "facet": "condition_category",
+      "parent_id": "infectious_disease",
+      "children_ids": [
+        "id_infectious_mononucleosis"
+      ]
+    },
+    {
+      "_id": "id_infectious_mononucleosis",
+      "display_name": "Infectious Mononucleosis (Mono)",
+      "facet": "condition",
+      "parent_id": "id_viral",
+      "children_ids": []
+    },
+    {
+      "_id": "id_parasitic",
+      "display_name": "Parasitic Infections",
+      "facet": "condition_category",
+      "parent_id": "infectious_disease",
+      "children_ids": [
+        "id_schistosomiasis"
+      ]
+    },
+    {
+      "_id": "id_schistosomiasis",
+      "display_name": "Schistosomiasis",
+      "facet": "condition",
+      "parent_id": "id_parasitic",
+      "children_ids": []
+    },
+    {
+      "_id": "id_mycological",
+      "display_name": "Mycological (Fungal) Infections",
+      "facet": "condition_category",
+      "parent_id": "infectious_disease",
+      "children_ids": []
+    },
+    {
+      "_id": "musculoskeletal_system",
+      "display_name": "Musculoskeletal System",
+      "facet": "system",
+      "parent_id": "organ_systems",
+      "children_ids": [
+        "msk_bone_neoplasms",
+        "msk_bone_disorders",
+        "msk_arthropathies"
+      ]
+    },
+    {
+      "_id": "msk_bone_neoplasms",
+      "display_name": "Bone Neoplasms",
+      "facet": "condition_category",
+      "parent_id": "musculoskeletal_system",
+      "children_ids": [
+        "msk_osteosarcoma"
+      ]
+    },
+    {
+      "_id": "msk_osteosarcoma",
+      "display_name": "Osteosarcoma",
+      "facet": "condition",
+      "parent_id": "msk_bone_neoplasms",
+      "children_ids": []
+    },
+    {
+      "_id": "msk_bone_disorders",
+      "display_name": "Bone Disorders",
+      "facet": "condition_category",
+      "parent_id": "musculoskeletal_system",
+      "children_ids": [
+        "msk_paget_disease",
+        "msk_achondroplasia",
+        "msk_osteoporosis"
+      ]
+    },
+    {
+      "_id": "msk_paget_disease",
+      "display_name": "Paget Disease of Bone",
+      "facet": "condition",
+      "parent_id": "msk_bone_disorders",
+      "children_ids": []
+    },
+    {
+      "_id": "msk_achondroplasia",
+      "display_name": "Achondroplasia",
+      "facet": "condition",
+      "parent_id": "msk_bone_disorders",
+      "children_ids": []
+    },
+    {
+      "_id": "msk_osteoporosis",
+      "display_name": "Osteoporosis",
+      "facet": "condition",
+      "parent_id": "msk_bone_disorders",
+      "children_ids": []
+    },
+    {
+      "_id": "msk_arthropathies",
+      "display_name": "Arthropathies",
+      "facet": "condition_category",
+      "parent_id": "musculoskeletal_system",
+      "children_ids": [
+        "msk_osteoarthritis"
+      ]
+    },
+    {
+      "_id": "msk_osteoarthritis",
+      "display_name": "Osteoarthritis",
+      "facet": "condition",
+      "parent_id": "msk_arthropathies",
+      "children_ids": []
+    },
+    {
+      "_id": "neurologic_system",
+      "display_name": "Neurologic System",
+      "facet": "system",
+      "parent_id": "organ_systems",
+      "children_ids": [
+        "neuro_cns_neoplasms",
+        "neuro_demyelinating",
+        "neuro_movement_disorders",
+        "neuro_neurocutaneous",
+        "neuro_neurodegenerative",
+        "neuro_peripheral_neuropathy",
+        "neuro_seizure_disorders"
+      ]
+    },
+    {
+      "_id": "neuro_cns_neoplasms",
+      "display_name": "CNS Neoplasms",
+      "facet": "condition_category",
+      "parent_id": "neurologic_system",
+      "children_ids": [
+        "neuro_meningioma"
+      ]
+    },
+    {
+      "_id": "neuro_meningioma",
+      "display_name": "Meningioma",
+      "facet": "condition",
+      "parent_id": "neuro_cns_neoplasms",
+      "children_ids": []
+    },
+    {
+      "_id": "neuro_demyelinating",
+      "display_name": "Demyelinating Diseases",
+      "facet": "condition_category",
+      "parent_id": "neurologic_system",
+      "children_ids": [
+        "neuro_multiple_sclerosis",
+        "neuro_gbs"
+      ]
+    },
+    {
+      "_id": "neuro_multiple_sclerosis",
+      "display_name": "Multiple Sclerosis (MS)",
+      "facet": "condition",
+      "parent_id": "neuro_demyelinating",
+      "children_ids": []
+    },
+    {
+      "_id": "neuro_gbs",
+      "display_name": "Guillain-Barré Syndrome (GBS)",
+      "facet": "condition",
+      "parent_id": "neuro_demyelinating",
+      "children_ids": []
+    },
+    {
+      "_id": "neuro_movement_disorders",
+      "display_name": "Movement Disorders",
+      "facet": "condition_category",
+      "parent_id": "neurologic_system",
+      "children_ids": [
+        "neuro_parkinson_disease"
+      ]
+    },
+    {
+      "_id": "neuro_parkinson_disease",
+      "display_name": "Parkinson Disease",
+      "facet": "condition",
+      "parent_id": "neuro_movement_disorders",
+      "children_ids": []
+    },
+    {
+      "_id": "neuro_neurocutaneous",
+      "display_name": "Neurocutaneous Disorders",
+      "facet": "condition_category",
+      "parent_id": "neurologic_system",
+      "children_ids": [
+        "neuro_nf1"
+      ]
+    },
+    {
+      "_id": "neuro_nf1",
+      "display_name": "Neurofibromatosis Type 1 (NF1)",
+      "facet": "condition",
+      "parent_id": "neuro_neurocutaneous",
+      "children_ids": []
+    },
+    {
+      "_id": "neuro_neurodegenerative",
+      "display_name": "Neurodegenerative Diseases",
+      "facet": "condition_category",
+      "parent_id": "neurologic_system",
+      "children_ids": [
+        "neuro_alzheimer_disease"
+      ]
+    },
+    {
+      "_id": "neuro_alzheimer_disease",
+      "display_name": "Alzheimer Disease",
+      "facet": "condition",
+      "parent_id": "neuro_neurodegenerative",
+      "children_ids": []
+    },
+    {
+      "_id": "neuro_peripheral_neuropathy",
+      "display_name": "Peripheral Neuropathies",
+      "facet": "condition_category",
+      "parent_id": "neurologic_system",
+      "children_ids": [
+        "neuro_brachial_plexus_injury",
+        "neuro_long_thoracic_nerve_injury"
+      ]
+    },
+    {
+      "_id": "neuro_brachial_plexus_injury",
+      "display_name": "Brachial Plexus Injury",
+      "facet": "condition",
+      "parent_id": "neuro_peripheral_neuropathy",
+      "children_ids": [
+        "neuro_erb_palsy"
+      ]
+    },
+    {
+      "_id": "neuro_erb_palsy",
+      "display_name": "Erb Palsy",
+      "facet": "subtype",
+      "parent_id": "neuro_brachial_plexus_injury",
+      "children_ids": []
+    },
+    {
+      "_id": "neuro_long_thoracic_nerve_injury",
+      "display_name": "Long Thoracic Nerve Injury",
+      "facet": "condition",
+      "parent_id": "neuro_peripheral_neuropathy",
+      "children_ids": []
+    },
+    {
+      "_id": "neuro_seizure_disorders",
+      "display_name": "Seizure Disorders",
+      "facet": "condition_category",
+      "parent_id": "neurologic_system",
+      "children_ids": []
+    },
+    {
+      "_id": "renal_urinary_system",
+      "display_name": "Renal & Urinary System",
+      "facet": "system",
+      "parent_id": "organ_systems",
+      "children_ids": [
+        "renal_glomerular_disease",
+        "renal_aki",
+        "renal_tubular_acidosis",
+        "renal_bladder_cancer"
+      ]
+    },
+    {
+      "_id": "renal_glomerular_disease",
+      "display_name": "Glomerular Diseases",
+      "facet": "condition_category",
+      "parent_id": "renal_urinary_system",
+      "children_ids": [
+        "renal_nephrotic_syndrome",
+        "renal_diabetic_nephropathy",
+        "renal_nephritic_syndrome"
+      ]
+    },
+    {
+      "_id": "renal_nephrotic_syndrome",
+      "display_name": "Nephrotic Syndrome",
+      "facet": "condition",
+      "parent_id": "renal_glomerular_disease",
+      "children_ids": []
+    },
+    {
+      "_id": "renal_diabetic_nephropathy",
+      "display_name": "Diabetic Nephropathy",
+      "facet": "condition",
+      "parent_id": "renal_glomerular_disease",
+      "children_ids": [
+        "renal_nodular_glomerulosclerosis"
+      ]
+    },
+    {
+      "_id": "renal_nodular_glomerulosclerosis",
+      "display_name": "Nodular Glomerulosclerosis",
+      "facet": "subtype",
+      "parent_id": "renal_diabetic_nephropathy",
+      "children_ids": []
+    },
+    {
+      "_id": "renal_nephritic_syndrome",
+      "display_name": "Nephritic Syndrome",
+      "facet": "condition",
+      "parent_id": "renal_glomerular_disease",
+      "children_ids": []
+    },
+    {
+      "_id": "renal_aki",
+      "display_name": "Acute Kidney Injury (AKI)",
+      "facet": "condition",
+      "parent_id": "renal_urinary_system",
+      "children_ids": [
+        "renal_aki_polyuric_phase"
+      ]
+    },
+    {
+      "_id": "renal_aki_polyuric_phase",
+      "display_name": "Polyuric Phase of AKI",
+      "facet": "subtype",
+      "parent_id": "renal_aki",
+      "children_ids": []
+    },
+    {
+      "_id": "renal_tubular_acidosis",
+      "display_name": "Renal Tubular Acidosis (RTA)",
+      "facet": "condition_category",
+      "parent_id": "renal_urinary_system",
+      "children_ids": [
+        "renal_rta_type4"
+      ]
+    },
+    {
+      "_id": "renal_rta_type4",
+      "display_name": "Type IV RTA",
+      "facet": "subtype",
+      "parent_id": "renal_tubular_acidosis",
+      "children_ids": []
+    },
+    {
+      "_id": "renal_bladder_cancer",
+      "display_name": "Bladder Cancer",
+      "facet": "condition_category",
+      "parent_id": "renal_urinary_system",
+      "children_ids": [
+        "renal_scc_bladder"
+      ]
+    },
+    {
+      "_id": "renal_scc_bladder",
+      "display_name": "Squamous Cell Carcinoma of the Bladder",
+      "facet": "condition",
+      "parent_id": "renal_bladder_cancer",
+      "children_ids": []
+    },
+    {
+      "_id": "reproductive_system",
+      "display_name": "Reproductive System",
+      "facet": "system",
+      "parent_id": "organ_systems",
+      "children_ids": [
+        "repro_male",
+        "repro_female",
+        "repro_genetic_disorders"
+      ]
+    },
+    {
+      "_id": "repro_male",
+      "display_name": "Male Reproductive System",
+      "facet": "subsystem",
+      "parent_id": "reproductive_system",
+      "children_ids": [
+        "repro_male_infertility"
+      ]
+    },
+    {
+      "_id": "repro_male_infertility",
+      "display_name": "Male Infertility",
+      "facet": "condition",
+      "parent_id": "repro_male",
+      "children_ids": []
+    },
+    {
+      "_id": "repro_female",
+      "display_name": "Female Reproductive System",
+      "facet": "subsystem",
+      "parent_id": "reproductive_system",
+      "children_ids": [
+        "repro_endometriosis"
+      ]
+    },
+    {
+      "_id": "repro_endometriosis",
+      "display_name": "Endometriosis",
+      "facet": "condition",
+      "parent_id": "repro_female",
+      "children_ids": []
+    },
+    {
+      "_id": "repro_genetic_disorders",
+      "display_name": "Genetic & Congenital Disorders",
+      "facet": "condition_category",
+      "parent_id": "reproductive_system",
+      "children_ids": [
+        "repro_klinefelter_syndrome"
+      ]
+    },
+    {
+      "_id": "repro_klinefelter_syndrome",
+      "display_name": "Klinefelter Syndrome",
+      "facet": "condition",
+      "parent_id": "repro_genetic_disorders",
+      "children_ids": []
+    },
+    {
+      "_id": "respiratory_system",
+      "display_name": "Respiratory System",
+      "facet": "system",
+      "parent_id": "organ_systems",
+      "children_ids": [
+        "resp_obstructive_lung_disease",
+        "resp_pneumonia"
+      ]
+    },
+    {
+      "_id": "resp_obstructive_lung_disease",
+      "display_name": "Obstructive Lung Disease",
+      "facet": "condition_category",
+      "parent_id": "respiratory_system",
+      "children_ids": [
+        "resp_chronic_bronchitis"
+      ]
+    },
+    {
+      "_id": "resp_chronic_bronchitis",
+      "display_name": "Chronic Bronchitis",
+      "facet": "condition",
+      "parent_id": "resp_obstructive_lung_disease",
+      "children_ids": []
+    },
+    {
+      "_id": "resp_pneumonia",
+      "display_name": "Pneumonia",
+      "facet": "condition_category",
+      "parent_id": "respiratory_system",
+      "children_ids": [
+        "resp_aspiration_pneumonia"
+      ]
+    },
+    {
+      "_id": "resp_aspiration_pneumonia",
+      "display_name": "Aspiration Pneumonia",
+      "facet": "condition",
+      "parent_id": "resp_pneumonia",
+      "children_ids": []
+    },
+    {
+      "_id": "rheumatology_vasculitis",
+      "display_name": "Rheumatology/Vasculitis",
+      "facet": "system",
+      "parent_id": "organ_systems",
+      "children_ids": [
+        "rheum_raynaud_phenomenon",
+        "rheum_sle",
+        "rheum_polymyositis"
+      ]
+    },
+    {
+      "_id": "rheum_raynaud_phenomenon",
+      "display_name": "Raynaud Phenomenon",
+      "facet": "condition",
+      "parent_id": "rheumatology_vasculitis",
+      "children_ids": []
+    },
+    {
+      "_id": "rheum_sle",
+      "display_name": "Systemic Lupus Erythematosus (SLE)",
+      "facet": "condition",
+      "parent_id": "rheumatology_vasculitis",
+      "children_ids": []
+    },
+    {
+      "_id": "rheum_polymyositis",
+      "display_name": "Polymyositis",
+      "facet": "condition",
+      "parent_id": "rheumatology_vasculitis",
+      "children_ids": []
+    },
+    {
+      "_id": "physician_competencies",
+      "display_name": "Physician Competencies",
+      "facet": "discipline",
+      "parent_id": null,
+      "children_ids": [
+        "diagnosis",
+        "management",
+        "foundational_science",
+        "communication_professionalism"
+      ]
+    },
+    {
+      "_id": "diagnosis",
+      "display_name": "Diagnosis",
+      "facet": "competency",
+      "parent_id": "physician_competencies",
+      "children_ids": [
+        "diag_interpretation"
+      ]
+    },
+    {
+      "_id": "diag_interpretation",
+      "display_name": "Diagnostic Interpretation",
+      "facet": "subcompetency",
+      "parent_id": "diagnosis",
+      "children_ids": [
+        "diag_lab_interpretation",
+        "diag_histology_interpretation",
+        "diag_imaging_interpretation",
+        "diag_physical_exam_findings"
+      ]
+    },
+    {
+      "_id": "diag_lab_interpretation",
+      "display_name": "Laboratory Interpretation",
+      "facet": "task",
+      "parent_id": "diag_interpretation",
+      "children_ids": []
+    },
+    {
+      "_id": "diag_histology_interpretation",
+      "display_name": "Histology Interpretation",
+      "facet": "task",
+      "parent_id": "diag_interpretation",
+      "children_ids": []
+    },
+    {
+      "_id": "diag_imaging_interpretation",
+      "display_name": "Imaging Interpretation",
+      "facet": "task",
+      "parent_id": "diag_interpretation",
+      "children_ids": []
+    },
+    {
+      "_id": "diag_physical_exam_findings",
+      "display_name": "Physical Exam Findings",
+      "facet": "task",
+      "parent_id": "diag_interpretation",
+      "children_ids": [
+        "diag_s4_gallop"
+      ]
+    },
+    {
+      "_id": "diag_s4_gallop",
+      "display_name": "S4 Gallop",
+      "facet": "finding",
+      "parent_id": "diag_physical_exam_findings",
+      "children_ids": []
+    },
+    {
+      "_id": "management",
+      "display_name": "Management",
+      "facet": "competency",
+      "parent_id": "physician_competencies",
+      "children_ids": [
+        "mgmt_pharmacotherapy",
+        "mgmt_counseling"
+      ]
+    },
+    {
+      "_id": "mgmt_pharmacotherapy",
+      "display_name": "Pharmacotherapy",
+      "facet": "subcompetency",
+      "parent_id": "management",
+      "children_ids": []
+    },
+    {
+      "_id": "mgmt_counseling",
+      "display_name": "Patient Counseling & Reassurance",
+      "facet": "subcompetency",
+      "parent_id": "management",
+      "children_ids": []
+    },
+    {
+      "_id": "foundational_science",
+      "display_name": "Foundational Science Application",
+      "facet": "competency",
+      "parent_id": "physician_competencies",
+      "children_ids": []
+    },
+    {
+      "_id": "communication_professionalism",
+      "display_name": "Communication & Professionalism",
+      "facet": "competency",
+      "parent_id": "physician_competencies",
+      "children_ids": []
+    },
+    {
+      "_id": "pathogenesis_mechanisms",
+      "display_name": "Pathogenesis & Disease Mechanisms",
+      "facet": "discipline",
+      "parent_id": null,
+      "children_ids": [
+        "pathogenesis_genetic",
+        "pathogenesis_infectious",
+        "pathogenesis_neoplasia",
+        "pathogenesis_autoimmune",
+        "pathogenesis_trauma"
+      ]
+    },
+    {
+      "_id": "pathogenesis_genetic",
+      "display_name": "Genetic & Congenital",
+      "facet": "pathogenesis",
+      "parent_id": "pathogenesis_mechanisms",
+      "children_ids": []
+    },
+    {
+      "_id": "pathogenesis_infectious",
+      "display_name": "Infectious",
+      "facet": "pathogenesis",
+      "parent_id": "pathogenesis_mechanisms",
+      "children_ids": []
+    },
+    {
+      "_id": "pathogenesis_neoplasia",
+      "display_name": "Neoplastic",
+      "facet": "pathogenesis",
+      "parent_id": "pathogenesis_mechanisms",
+      "children_ids": [
+        "neoplasia_premalignant"
+      ]
+    },
+    {
+      "_id": "neoplasia_premalignant",
+      "display_name": "Premalignant Conditions",
+      "facet": "condition_category",
+      "parent_id": "pathogenesis_neoplasia",
+      "children_ids": []
+    },
+    {
+      "_id": "pathogenesis_autoimmune",
+      "display_name": "Autoimmune & Inflammatory",
+      "facet": "pathogenesis",
+      "parent_id": "pathogenesis_mechanisms",
+      "children_ids": []
+    },
+    {
+      "_id": "pathogenesis_trauma",
+      "display_name": "Traumatic",
+      "facet": "pathogenesis",
+      "parent_id": "pathogenesis_mechanisms",
+      "children_ids": []
+    }
+  ]
+}

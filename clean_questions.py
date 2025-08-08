@@ -8,7 +8,8 @@ without making any changes to the database.
 import sys
 import os
 import re
-from typing import Dict, Any
+import json
+from typing import Dict, Any, List
 
 try:
     from bs4 import BeautifulSoup
@@ -101,8 +102,35 @@ def process_question_document(question_doc: Dict[str, Any]) -> Dict[str, Any]:
     
     return clean_question_data
 
+def format_question_for_output(clean_data: Dict[str, Any]) -> str:
+    """
+    Format a cleaned question dictionary into the specified text format.
+    
+    Args:
+        clean_data (Dict): Cleaned question data
+        
+    Returns:
+        str: Formatted question text
+    """
+    formatted_text = f"        Question: {clean_data['question']}\n\n"
+    formatted_text += "        Options:\n"
+    
+    # Sort choices by ID to ensure consistent order (A, B, C, D, etc.)
+    sorted_choices = sorted(clean_data['choices'], key=lambda x: x['id'])
+    
+    for choice in sorted_choices:
+        formatted_text += f"        {choice['id']}) {choice['text']}\n"
+    
+    formatted_text += f"\n        Explanation: {clean_data['explanation']}"
+    
+    return formatted_text
+
 def main():
-    """Main function to connect to database and process one question."""
+    """Main function to connect to database and process multiple questions."""
+    # Number of questions to fetch
+    num_questions = 5000
+    output_file = "cleaned_questions.txt"
+    
     print("Connecting to database...")
     
     # Get the Questions collection
@@ -112,37 +140,63 @@ def main():
         print("❌ Failed to connect to Questions collection")
         return
     
-    # Get one question document
-    print("Fetching one question from the database...")
-    question_doc = questions_collection.find_one()
+    # Get multiple question documents
+    print(f"Fetching {num_questions} questions from the database...")
+    question_docs = questions_collection.find().limit(num_questions)
     
-    if not question_doc:
+    # Convert cursor to list to check if we got any results
+    question_docs_list = list(question_docs)
+    
+    if not question_docs_list:
         print("❌ No questions found in the database")
         return
     
-    print(f"✅ Successfully fetched question with ID: {question_doc.get('_id', 'Unknown')}")
+    print(f"✅ Successfully fetched {len(question_docs_list)} questions")
     
-    # Process the question document
+    # Process all question documents
     print("\n--- Processing Question Data ---")
-    clean_data = process_question_document(question_doc)
+    cleaned_questions = []
     
-    # Display the clean data
-    print(f"\nQuestion ID: {clean_data['id']}")
-    print(f"Name: {clean_data['name']}")
-    print(f"Source: {clean_data['source']}")
-    print(f"Tags: {clean_data['tags']}")
+    for i, question_doc in enumerate(question_docs_list):
+        if (i + 1) % 100 == 0:
+            print(f"Processed {i + 1}/{len(question_docs_list)} questions...")
+        
+        clean_data = process_question_document(question_doc)
+        cleaned_questions.append(clean_data)
     
-    print("\n--- Clean Question Text ---")
-    print(clean_data['question'])
+    # Save the cleaned questions to a file in the specified format
+    print(f"\n--- Saving {len(cleaned_questions)} cleaned questions to {output_file} ---")
+    try:
+        with open(output_file, 'w', encoding='utf-8') as f:
+            for i, clean_data in enumerate(cleaned_questions):
+                # Format each question according to the specified template
+                formatted_question = format_question_for_output(clean_data)
+                
+                # Write the formatted question to the file
+                f.write(formatted_question)
+                
+                # Add a separator between questions (except for the last one)
+                if i < len(cleaned_questions) - 1:
+                    f.write("\n\n" + "="*80 + "\n\n")
+        
+        print(f"✅ Successfully saved cleaned questions to {output_file}")
+    except Exception as e:
+        print(f"❌ Failed to save questions to file: {e}")
+        return
     
-    print("\n--- Clean Choices ---")
-    for choice in clean_data['choices']:
-        print(f"{choice['id']}) {choice['text']} (Correct: {choice['is_correct']})")
+    # Display a sample of the clean data
+    if cleaned_questions:
+        sample = cleaned_questions[0]
+        print(f"\n--- Sample of Cleaned Question Data (ID: {sample['id']}) ---")
+        print(f"Name: {sample['name']}")
+        print(f"Source: {sample['source']}")
+        print(f"Tags: {sample['tags']}")
+        
+        print("\n--- Formatted Question Text ---")
+        print(format_question_for_output(sample))
     
-    print("\n--- Clean Explanation ---")
-    print(clean_data['explanation'])
-    
-    print("\n✅ Script completed successfully. No changes were made to the database.")
+    print(f"\n✅ Script completed successfully. Processed {len(cleaned_questions)} questions and saved to {output_file}.")
+    print("No changes were made to the database.")
 
 if __name__ == "__main__":
     main()

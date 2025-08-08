@@ -61,7 +61,7 @@ This phase establishes a benchmark and can be implemented relatively quickly.
         ```
         Title: [Question's internal title or topic, if available]
 
-        Case Presentation: [Paste question body here]
+        Question: [Paste question body here]
 
         Options:
         A) [Option A text]
@@ -69,7 +69,7 @@ This phase establishes a benchmark and can be implemented relatively quickly.
         C) [Option C text]
         D) [Option D text]
 
-        Correct Answer Explanation: [Paste full explanation here]
+        Explanation: [Paste full explanation here]
 
         Key Learning Objective: [This is the core concept being tested]
         ```
