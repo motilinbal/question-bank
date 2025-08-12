@@ -1,9 +1,5 @@
 # Master Reference: test_db Database Architecture
 
-**Version:** 2.0
-**Date:** July 11, 2025
-**Author:** Gemini Engineering Intelligence
-
 ---
 
 ## 1. Overview and Core Architectural Issue

@@ -1,0 +1,268 @@
+[
+  {
+    "id": "22528a90-83fe-458c-9831-890145a98331",
+    "question": "A 70-year-old woman comes to the physician because of a 4-month history of fatigue, worsening swelling of her ankles , and a 5-kg (11-lb) weight gain. Neurologic examination shows diminished two-point discrimination in her fingers . Laboratory studies show a hemoglobin A 1c concentration of 9.2% and a creatinine concentration of 1.3 mg/dL . Urine dipstick shows heavy proteinuria . A biopsy specimen of this patient's kidney is most likely to show which of the following?",
+    "choices": [
+      {
+        "id": 1,
+        "text": "Split glomerular basement membrane",
+        "is_correct": false
+      },
+      {
+        "id": 2,
+        "text": "Immune complex deposition",
+        "is_correct": false
+      },
+      {
+        "id": 3,
+        "text": "Interstitial inflammation",
+        "is_correct": false
+      },
+      {
+        "id": 4,
+        "text": "Wire looping of capillaries",
+        "is_correct": false
+      },
+      {
+        "id": 5,
+        "text": "Nodular glomerulosclerosis",
+        "is_correct": true
+      }
+    ],
+    "explanation": "OPTION a is Incorrect . Splitting of the glomerular basement membrane (tram track appearance) on electron microscopy is seen in membranoproliferative glomerulonephritis . Although this condition is associated with nephrotic syndrome , which this patient likely has, the disease would not explain her neurologic findings and elevated hemoglobin A 1c . Splitting of the glomerular basement membrane can also be seen in individuals with Alport syndrome , but this condition manifests with hematuria in males during infancy . OPTION b is Incorrect . Immune complex deposition with a “spike-and-dome” appearance on electron microscopy is a characteristic finding in patients with membranous nephropathy , the most common cause of nephrotic syndrome in white adults. Deposition of antibodies between podocytes and the basal membrane causes thickening of glomerular capillary loops and the basal membrane, which in turn leads to nephrotic syndrome . However, the disease would not explain this patient's neurologic findings and elevated hemoglobin A 1c . OPTION c is Incorrect . Interstitial inflammation is a common finding in allergic interstitial nephritis , a type of nephropathy that is caused by a hypersensitivity reaction to drugs such as antibiotics , NSAIDs , and diuretics . Patients with this disorder typically present with eosinophiluria , gross hematuria , flank pain , and a diffuse maculopapular rash , none of which are present here. OPTION d is Incorrect . Capillary wire looping, which is associated with diffuse subendothelial glomerular deposits, is a typical electron microscopic finding in diffuse proliferative glomerulonephritis ( DPGN ). DPGN can manifest with elevated serum creatinine and nephrotic syndrome , as seen in this patient, but it most commonly occurs in individuals with systemic lupus erythematosus and typically manifests with gross hematuria . OPTION e is Correct . Nodular glomerulosclerosis with Kimmelstiel-Wilson nodules is pathognomonic for diabetic nephropathy , although diffuse glomerulosclerosis is the most common finding. In patients with insufficiently controlled diabetes mellitus , chronic hyperglycemia results in non-enzymatic glycosylation of tissue proteins . This leads to increased synthesis and decreased degeneration of the mesangial matrix within renal glomeruli , which causes mesangial expansion. Thickening and increased permeability of the glomerular basement membrane causes hyperfiltration, which leads to glomerular hypertrophy and scarring."
+  },
+  {
+    "id": "b52aef46-0537-46a1-89ef-9a97f3ccb89d",
+    "question": "A 45-year-old woman with hypothyroidism comes to the physician because of progressive fatigue, lethargy, and epigastric pain after eating . Physical examination shows pale conjunctivae. Laboratory studies show decreased serum hemoglobin levels and increased serum gastrin levels. Esophagogastroduodenoscopy shows inflammation of the gastric body and fundus. A photomicrograph of a biopsy specimen taken from the gastric antrum is shown. Which of the following is the most likely cause of this patient's symptoms?",
+    "choices": [
+      {
+        "id": 1,
+        "text": "S cell hyperplasia",
+        "is_correct": false
+      },
+      {
+        "id": 2,
+        "text": "Mucosal cell hyperplasia",
+        "is_correct": false
+      },
+      {
+        "id": 3,
+        "text": "Enterochromaffin-like cell hyperplasia",
+        "is_correct": false
+      },
+      {
+        "id": 4,
+        "text": "Parietal cell destruction",
+        "is_correct": true
+      },
+      {
+        "id": 5,
+        "text": "Chief cell destruction",
+        "is_correct": false
+      },
+      {
+        "id": 6,
+        "text": "I cell destruction",
+        "is_correct": false
+      }
+    ],
+    "explanation": "OPTION a is Incorrect . S cell hyperplasia would lead to an increased secretion of secretin , which normally increases pancreatic bicarbonate secretion and decreases gastric acid secretion by physiologically inhibiting gastrin secretion from G cells . Increased secretin would not cause anemia , inflammation of the gastric body and fundus, elevated gastrin production, or G-cell hyperplasia . OPTION b is Incorrect . Mucosal cell hyperplasia would lead to an increased secretion of bicarbonate , which increases gastric pH . While hypochlorhydria can result in microcytic anemia (due to decreased absorption of iron ), mucosal cell hyperplasia would not explain the inflammation of the gastric body and fundus, an elevated gastrin production, or G-cell hyperplasia seen in this patient. OPTION c is Incorrect . Enterochromaffin-like cell ( ECL ) hyperplasia would increase the secretion of histamine and subsequently gastric acid production, which can lead to inflammation of the gastric body and fundus. Gastrin stimulates histamine release from ECL cells but would not occur as a consequence of ECL hyperplasia . The combination of anemia , hypergastrinemia , and G-cell hyperplasia are more likely due to an alternate etiology. OPTION d is Correct . Parietal cell destruction in the gastric fundus is seen in autoimmune-mediated atrophic gastritis ( AMAG ), which results in reduced gastric acid production. The reduced acid production in AMAG leads to loss of negative feedback on G cells , which subsequently causes G cell hyperplasia in the gastric antrum and hypergastrinemia . Parietal cell destruction also impairs intrinsic factor production and causes decreased vitamin B12 absorption in the ileum , leading to vitamin B 12 deficiency anemia ( pernicious anemia ). However, iron deficiency anemia may be present earlier in the disease course, due to the decreased solubility of iron in the setting of hypochlorhydria. OPTION e is Incorrect . Chief cell destruction is seen in chronic gastritis with mucosal atrophy and would lead to impaired protein digestion due to decreased production of pepsinogen (which is converted to pepsin ). Since pepsin cleaves vitamin B 12 from food proteins , a pepsin deficiency can impair the absorption of protein-bound vitamin B 12 , which would manifest with macrocytic anemia . However, chief cell destruction would not affect gastrin production or cause the G-cell hyperplasia seen here. OPTION f is Incorrect . I cell destruction would lead to a decreased secretion of cholecystokinin , which normally increases pancreatic secretion, mediates gallbladder contraction, and inhibits gastric emptying. Decreased secretion of cholecystokinin would not explain the anemia , inflammation of the gastric body and fundus, elevated gastrin production, or G-cell hyperplasia seen in this patient."
+  },
+  {
+    "id": "f5392527-b16c-4520-816a-8efa33e83c02",
+    "question": "A 54-year-old man comes to the physician for a follow-up appointment. Three weeks ago he underwent emergent cardiac catheterization because of myocardial infarction and had to stay at the hospital longer than expected because of decreased kidney function . He says his symptoms have since improved greatly and he now produces even more urine than before the procedure. His serum creatinine concentration is 1.6 mg/dL and blood urea nitrogen concentration is 20 mg/dL . This patient is at increased risk for which of the following complications?",
+    "choices": [
+      {
+        "id": 1,
+        "text": "Hypermagnesemia",
+        "is_correct": false
+      },
+      {
+        "id": 2,
+        "text": "Metabolic alkalosis",
+        "is_correct": false
+      },
+      {
+        "id": 3,
+        "text": "Hypernatremia",
+        "is_correct": false
+      },
+      {
+        "id": 4,
+        "text": "Hypokalemia",
+        "is_correct": true
+      },
+      {
+        "id": 5,
+        "text": "Hyporeninemia",
+        "is_correct": false
+      }
+    ],
+    "explanation": "OPTION a is Incorrect . Three weeks after exposure to contrast, this patient is in the polyuric phase of AKI and is actually at risk for hypomagnesemia , rather than hypermagnesemia . During this period, patients lose several electrolytes that are normally reabsorbed by the tubules, including magnesium , into the urine . OPTION b is Incorrect . Three weeks after exposure to contrast, this patient is in the polyuric phase of AKI . During this period, patients have difficulty excreting H + ions and regenerating bicarbonate (a function of the tubular system), putting them at risk for metabolic acidosis , rather than alkalosis . OPTION c is Incorrect . Three weeks after exposure to contrast, this patient is in the polyuric phase of AKI and is actually at risk for hyponatremia , rather than hypernatremia . During this period, patients lose several electrolytes that are normally reabsorbed by the tubules, including sodium, into the urine . OPTION d is Correct . Three weeks after exposure to contrast, this patient is in the polyuric phase of AKI and is at risk for hypokalemia . During this period, patients lose several electrolytes that are normally reabsorbed by the tubules, including potassium, into the urine . OPTION e is Incorrect . Patients in the polyuric phase of AKI are at risk for volume depletion , a state in which GFR and sodium delivery to the distal nephrons decreases, causing the release of renin . Therefore, this patient would actually have an increase in renin release."
+  },
+  {
+    "id": "4aee21dc-b739-46da-ac4b-7686ea4871e5",
+    "question": "An investigator is studying the effects of an antihypertensive drug during pregnancy. Follow-up studies show that the drug can adversely affect differentiation of the ureteric bud into its direct derivatives in fetuses exposed during the first trimester. Which of the following structures is most likely to develop incorrectly in the affected fetus?",
+    "choices": [
+      {
+        "id": 1,
+        "text": "Distal convoluted tubule",
+        "is_correct": false
+      },
+      {
+        "id": 2,
+        "text": "Bowman's capsule",
+        "is_correct": false
+      },
+      {
+        "id": 3,
+        "text": "Collecting ducts",
+        "is_correct": true
+      },
+      {
+        "id": 4,
+        "text": "Bladder",
+        "is_correct": false
+      },
+      {
+        "id": 5,
+        "text": "Loop of Henle",
+        "is_correct": false
+      },
+      {
+        "id": 6,
+        "text": "Proximal convoluted tubule",
+        "is_correct": false
+      }
+    ],
+    "explanation": "OPTION a is Incorrect . The distal convoluted tubule is part of the excretory system, which originates from the metanephric mesenchyme – not the ureteric bud . The distal convoluted tubule does, however, represent the connecting point between direct derivatives of the metanephric mesenchyme and those that originate from the ureteric bud . OPTION b is Incorrect . The Bowman's capsule is part of the excretory system of the kidney , which originates from the metanephric mesenchyme – not the ureteric bud . OPTION c is Correct . The collecting ducts and tubules, as well as the ureter , renal pelvis , major calyces, and minor calyces, develop from the ureteric bud . A defective ureteric bud would thus likely cause these structures to develop incorrectly. OPTION d is Incorrect . The bladder develops from the upper part of the urogenital sinus , which is also connected to the allantois . Over time, the allantois obliterates and ultimately becomes the median umbilical ligament after birth . OPTION e is Incorrect . The Loop of Henle is part of the excretory system of the kidney , which originates from the metanephric mesenchyme – not the ureteric bud . OPTION f is Incorrect . The proximal convoluted tubule is part of the excretory system of the kidney , which originates from the metanephric mesenchyme – not the ureteric bud ."
+  },
+  {
+    "id": "38ea9da4-0471-4e78-b5a9-e3712dc38428",
+    "question": "A 65-year-old man with hypertension comes to the physician for a routine health maintenance examination. Current medications include atenolol, lisinopril, and atorvastatin. His pulse is 86/min, respirations are 18/min, and blood pressure is 145/95 mm Hg . Cardiac examination is shown . Which of the following is the most likely cause of this physical examination finding?",
+    "choices": [
+      {
+        "id": 1,
+        "text": "Decreased compliance of the left ventricle",
+        "is_correct": true
+      },
+      {
+        "id": 2,
+        "text": "Myxomatous degeneration of the mitral valve",
+        "is_correct": false
+      },
+      {
+        "id": 3,
+        "text": "Inflammation of the pericardium",
+        "is_correct": false
+      },
+      {
+        "id": 4,
+        "text": "Dilation of the aortic root",
+        "is_correct": false
+      },
+      {
+        "id": 5,
+        "text": "Thickening of the mitral valve leaflets",
+        "is_correct": false
+      }
+    ],
+    "explanation": "OPTION a is Correct . Decreased compliance of the left ventricle is most likely due to left ventricular hypertrophy caused by long-standing hypertension and often manifests with an S 4 gallop . Increased blood pressure activates angiotensin II either by local mechanical stretching of myocardiocytes or as a result of the activation of the renin-angiotensin-aldosterone system . Angiotensin II promotes concentric remodeling of the heart , increasing stiffness of the organ, thus, decreasing compliance . OPTION b is Incorrect . Myxomatous degeneration of the mitral valve occurs in some connective tissue diseases (e.g., Marfan syndrome , Ehler-Danlos syndrome ) leading to eventual mitral valve prolapse ( MVP ). MVP is associated with late- systolic crescendo murmurs as blood backflows from the left ventricle to the left atrium , followed by a midsystolic click due to tensing of the chordae tendinae . The mitral regurgitation and volume overload associated with MVP can also result in an S3 , which is an early diastolic sound, but MVP is not typically associated with an S4 , as seen here. OPTION c is Incorrect . Pericardial inflammation ( pericarditis ), which is typically caused by viral infections, would result in an auscultatory finding ( pericardial friction rub ) but this sound would be heard in both diastolic and systolic portions of the cardiac cycle and it would be best heard along the left sternal border when the patient sits upright, leans forward, and holds his breath. The sound that is heard here is an S4 gallop , which is an unusual finding in pericarditis . Moreover, patients with pericarditis are rarely asymptomatic; they would usually complain of chest pain and/or breathlessness. It is, therefore, unlikely that this patient has pericarditis . OPTION d is Incorrect . Dilation of the aortic root, which is caused by age-related degenerative changes, hypertension , aortitis (e.g., tertiary syphilis ), or connective tissue disease (e.g., Marfan syndrome ), causes chronic aortic insufficiency ( AI ). AI can result in a low-pitched , mid or late diastolic sound that is best heard at the cardiac apex due to vibration of the ventricular wall by the regurgitant jet. However, a patient with AI would also have an early diastolic murmur best heard in the right upper sternal border. An isolated low-pitched , late diastolic sound on cardiac examination suggests another cause. OPTION e is Incorrect . Thickening of the mitral leaflet is seen in mitral stenosis and is the cause of the opening snap , which is an early diastolic sound that is best heard at the apex in the left lateral decubitus position . However, the opening snap is a high-pitched sound, unlike the low-pitched sound heard here, and it would be accompanied by the late- diastolic , decrescendo murmur of mitral stenosis ."
+  },
+  {
+    "id": "4c632095-70b9-4205-ae8c-2f39f703baf9",
+    "question": "A 28-year-old woman comes to the physician because of increasingly frequent episodes of double vision for 2 days. She was seen in the emergency department for an episode of imbalance and decreased sensation in her right arm 3 months ago. Examination shows impaired adduction of the right eye with left lateral gaze but normal convergence of both eyes. Deep tendon reflexes are 4+ in all extremities. The Romberg test is positive. An MRI of the brain shows hyperintense oval plaques in the periventricular region and a plaque in the midbrain on T2-weighted images. Microscopic examination of material from the midbrain plaque would most likely show which of the following?",
+    "choices": [
+      {
+        "id": 1,
+        "text": "Eosinophilic intracytoplasmic inclusion bodies",
+        "is_correct": false
+      },
+      {
+        "id": 2,
+        "text": "Loss of axons and atrophy of oligodendrocytes",
+        "is_correct": false
+      },
+      {
+        "id": 3,
+        "text": "Lymphocytic infiltration of the endoneurium",
+        "is_correct": false
+      },
+      {
+        "id": 4,
+        "text": "Extracellular deposits of amyloid peptides",
+        "is_correct": false
+      },
+      {
+        "id": 5,
+        "text": "Demyelination with partial preservation of axons",
+        "is_correct": true
+      }
+    ],
+    "explanation": "OPTION a is Incorrect . Eosinophilic intracytoplasmic inclusion bodies within neurons , known as Lewy bodies , are typical histopathological markers of Parkinson disease , multiple system atrophy , and dementia with Lewy bodies . These diseases can manifest with postural instability . However, characteristic features of parkinsonism ( bradykinesia , rigidity , resting tremor ) would also be expected. Furthermore, it would be unusual for these diseases to manifest in a patient who is so young (typical age of onset is > 60 years ). OPTION b is Incorrect . Loss of axons and atrophy of oligodendrocytes is a sign of advanced neurodegeneration. It can be seen on microscopic examination of older (chronic) lesions in multiple sclerosis . Here, however, in this patient, the tissue is taken from the acute midbrain plaque , where those longterm damages would not yet be evident. OPTION c is Incorrect . Lymphocytic infiltration of the endoneurium resulting in myelin damage is a typical finding in Guillain-Barré syndrome ( GBS ), which typically presents with ascending paralysis, reduced or absent muscle reflexes, peripheral, symmetric paresthesias in the hands and feet, and neuropathic pain . Furthermore, GBS typically appears after a gastrointestinal or respiratory infection and would not show plaques on MRI imaging. OPTION d is Incorrect . Extracellular plaques composed of amyloid beta are common histopathological markers of Alzheimer disease . Patients with Alzheimer disease typically present with short-term memory loss and loss of attention control/reasoning, orientation, and language, none of which is present in this patient. Furthermore, MRI would show generalized atrophy in the CNS , most pronounced in the hippocampus and/or medial temporal lobe . Additionally, it would be unusual for the disease to manifest in a patient who is so young (typical age of onset is > 65 years ). OPTION e is Correct . Acute multiple sclerosis plaques are characterized by demyelination with partial preservation of axons , along with infiltration of immune cells , accumulation of macrophages with phagocytized myelin , and parenchymal edema . These changes are a result of an autoimmune reaction in which mainly T helper cells are activated against CNS antigens . This reaction can be triggered by environmental factors such as infection with EBV or HHV 6 , UV radiation , insufficient vitamin D consumption, and/or cigarette smoking . The subsequent inflammatory process leads to focal demyelination with nerve destruction, gliosis , and inadequate remyelination, which, in turn, results in impaired saltatory conduction of action potentials ."
+  },
+  {
+    "id": "6a5168a4-0432-44ae-8b9f-15612aba1a34",
+    "question": "A 52-year-old woman comes to the physician for a routine physical examination. She has type 2 diabetes mellitus treated with metformin. Her blood pressure is 162/96 mm Hg . Treatment with a drug is initiated . Two weeks later, the patient develops a dry cough and the drug is discontinued . The patient is subsequently started on another drug . Which of the following is the most likely effect of this new medication? 24-hour urine sodium Peripheral vascular resistance Renin Angiotensin II Aldosterone A Increased decreased increased decreased decreased B Increased decreased decreased decreased decreased C Increased increased increased increased increased D Decreased decreased increased increased increased E Increased decreased increased increased decreased",
+    "choices": [
+      {
+        "id": 1,
+        "text": "A",
+        "is_correct": false
+      },
+      {
+        "id": 2,
+        "text": "B",
+        "is_correct": false
+      },
+      {
+        "id": 3,
+        "text": "C",
+        "is_correct": false
+      },
+      {
+        "id": 4,
+        "text": "D",
+        "is_correct": false
+      },
+      {
+        "id": 5,
+        "text": "E",
+        "is_correct": true
+      }
+    ],
+    "explanation": "OPTION a is Incorrect . This combination of effects could be explained by treatment with ACE inhibitors (e.g., enalapril ), which inhibit the conversion of angiotensin I to angiotensin II , resulting in low levels of angiotensin II . Angiotensin II mediates sodium reabsorption in the proximal tubule, vasoconstriction , and aldosterone release. Decreased activation of angiotensin II receptors would, therefore, lead to an increase in urinary sodium excretion, decreased vessel tone, and lower levels of aldosterone . The combination of these effects lowers blood pressure. Treatment with ACE inhibitors would typically lead to an increase in renin levels and renin activity due to a loss of negative feedback regulation. OPTION b is Incorrect . This combination of effects could be explained by treatment with beta-1 blockers (e.g., metoprolol ). Beta-1 blockers inhibit the production and release of renin , which leads to suppression of the downstream renin-angiotensin-aldosterone system ( RAAS ) components (i.e., angiotensin II and aldosterone ) and, subsequently, mildly decreased vessel tone and increased urinary sodium excretion. OPTION c is Incorrect . This combination of effects could be explained by treatment with diuretics , which increase urine sodium elimination and cause a transient increase in renin-angiotensin-aldosterone system ( RAAS ) activity and peripheral vascular tone. Over time, the activity of the RAAS system and peripheral vascular tone will decrease. OPTION d is Incorrect . This combination of effects could be explained by treatment with vasodilators such as hydralazine and alpha-1 blockers (e.g., doxazosin ), which directly decrease peripheral vessel tone, resulting in lower blood pressure. Increased activation of the renin-angiotensin-aldosterone system would occur as a compensatory response to maintain GFR resulting in increased renin , angiotensin II , and aldosterone levels as well as decreased urinary sodium excretion. OPTION e is Correct . Angiotensin II receptor antagonists (e.g., losartan , valsartan , candesartan ) inhibit angiotensin II receptors ( AT 1 receptors ). Angiotensin II mediates sodium reabsorption in the proximal tubule, vasoconstriction , and aldosterone release. Blocking of angiotensin II receptors, therefore, leads to an increase in urinary sodium excretion, decreased peripheral vascular resistance , and lower levels of aldosterone . The combination of these effects lowers blood pressure. To compensate for decreased sodium and water reabsorption, the juxtaglomerular apparatus will release more renin , which will subsequently increase the levels of both angiotensin I and angiotensin II . Meanwhile, bradykinin levels are not affected, as ARBs have no effect on ACE , which metabolizes bradykinin . Therefore, ARBs do not cause a dry cough as a side effect."
+  },
+  {
+    "id": "8ef79e08-ce9a-4874-a411-3b5654e4a684",
+    "question": "A 32-year-old woman comes to the physician because of a 3-week history of intermittent loose stools and a 1.2-kg (2.6-lb) weight loss. She immigrated to the US from Uganda 6 weeks ago. Abdominal examination shows diffuse tenderness with no guarding or rebound. The liver is firm and palpable 3 cm below the right costal margin, and the spleen is palpable just below the left costal margin. Her leukocyte count is 12,800/mm 3 ( 12% eosinophils ). A photomicrograph of a stool sample is shown. Microscopic examination of a liver biopsy specimen shows granulomatous inflammation with periportal fibrosis . Exposure to which of the following is most likely to have played a role in the development of this patient's symptoms?",
+    "choices": [
+      {
+        "id": 1,
+        "text": "Tsetse flies",
+        "is_correct": false
+      },
+      {
+        "id": 2,
+        "text": "Undercooked pork meat",
+        "is_correct": false
+      },
+      {
+        "id": 3,
+        "text": "Undercooked fish meat",
+        "is_correct": false
+      },
+      {
+        "id": 4,
+        "text": "Dog feces",
+        "is_correct": false
+      },
+      {
+        "id": 5,
+        "text": "Freshwater snails",
+        "is_correct": true
+      }
+    ],
+    "explanation": "OPTION a is Incorrect . African sleeping sickness is caused by Trypanosoma brucei infection, a parasite transmitted by the tsetse fly . Early in the course of this disease, non-specific symptoms such as intermittent fever , headaches , lymphadenopathy , and arthralgias are seen (hemolymphatic phase). Weeks to months later, invasion of the central nervous system may lead to confusion, coordination problems, and sleeping disorders (neurological phase), none of which are seen in this patient. OPTION b is Incorrect . Trichinella spiralis can be transmitted by ingestion of larvae in undercooked pork meat, causing trichinellosis . After ingestion of contaminated meat, cysts release larvae in the stomach , causing gastrointestinal symptoms including abdominal pain , bloating , and diarrhea (enteral phase). Adult worms then migrate to muscles, where they encyst, causing myalgia (parenteral phase). Taenia solium can also be transmitted by the ingestion of larvae ( cysticerci ) in contaminated raw pork meat. Hepatosplenic involvement, as seen in this patient, would not be expected with either of these parasites . Schistosomiasis is not associated with undercooked pork. OPTION c is Incorrect . Ingestion of undercooked freshwater fish is the mode of transmission of Diphyllobothrium latum and Clonorchis sinensis . Both types of infection can lead to nonspecific gastrointestinal symptoms such as diarrhea , abdominal pain , and weight loss. Clonorchis sinensis infection can also affect the hepatobiliary tract and classically presents with cholelithiasis and cholangitis secondary to formation of brown pigment gallstones . However, the stool culture findings seen in this patient are not consistent with either of these pathogens and ingestion of freshwater fish is not associated with schistosomiasis . OPTION d is Incorrect . Toxocara canis ( dog roundworm ) and Echinococcus granulosus (hydatid tapeworm ) are two parasites that can be acquired by ingestion of eggs from the feces of an infected dog. Echinococcosis is classically a condition of the lungs and liver and presents with single or multiple hepatic hydatid cysts, which may lead to liver enlargement. Symptoms of toxocariasis include weight loss and hepatomegaly . However, the stool culture findings seen in this patient are not consistent with either of these pathogens and exposure to dog feces is not associated with schistosomiasis . OPTION e is Correct . Freshwater snails in endemic regions (including most parts of Africa) serve as the intermediate host for schistosomiasis . Parasitic larvae ( cercariae ) initially penetrate the skin and enter the circulation to mature, and eventually produce eggs that migrate through the venous system and can spread to the lungs , spleen , liver , and brain. Hepatosplenic involvement is commonly seen with Schistosoma mansoni and Schistosoma japonicum infection, while chronic infection with Schistosoma haematobium classically leads to epithelial metaplasia and squamous cell carcinoma of the bladder ."
+  }
+]

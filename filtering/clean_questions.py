@@ -158,8 +158,8 @@ def update_question_text_field(question_id: str, cleaned_text: str) -> bool:
 def main():
     """Main function to connect to database and process multiple questions."""
     # Number of questions to fetch (set to None to process all questions)
-    num_questions = None  # Set to a number like 5000 to limit, or None for all questions
-    output_file = "cleaned_questions.txt"
+    num_questions = 10  # Set to a number like 5000 to limit, or None for all questions
+    output_file = "cleaned_questions.json"
     
     print("Connecting to database...")
     
@@ -202,7 +202,7 @@ def main():
                 print(f"Processed {count}/{num_questions} questions...")
         
         clean_data = process_question_document(question_doc)
-        # cleaned_questions.append(clean_data)
+        cleaned_questions.append(clean_data)
         
         # Format the question for the text field
         formatted_text = format_question_for_output(clean_data)
@@ -210,7 +210,8 @@ def main():
         # Update the database
         question_id = question_doc.get("_id", "")
         if question_id:
-            success = update_question_text_field(question_id, formatted_text)
+            # success = update_question_text_field(question_id, formatted_text)
+            success = True
             if success:
                 update_stats["success"] += 1
             else:
@@ -227,20 +228,23 @@ def main():
     
     print(f"✅ Successfully processed {count} questions")
     
-    # Save the cleaned questions to a file in the specified format
+    # Save the cleaned questions to a file as JSON
     print(f"\n--- Saving cleaned questions to {output_file} ---")
     try:
+        # Create a list of question objects with only the required fields
+        json_questions = []
+        for clean_data in cleaned_questions:
+            json_question = {
+                "id": clean_data["id"],
+                "question": clean_data["question"],
+                "choices": clean_data["choices"],
+                "explanation": clean_data["explanation"]
+            }
+            json_questions.append(json_question)
+        
+        # Write the JSON data to file
         with open(output_file, 'w', encoding='utf-8') as f:
-            for i, clean_data in enumerate(cleaned_questions):
-                # Format each question according to the specified template
-                formatted_question = format_question_for_output(clean_data)
-                
-                # Write the formatted question to the file
-                f.write(formatted_question)
-                
-                # Add a separator between questions (except for the last one)
-                if i < len(cleaned_questions) - 1:
-                    f.write("\n\n" + "="*80 + "\n\n")
+            json.dump(json_questions, f, indent=2, ensure_ascii=False)
         
         print(f"✅ Successfully saved cleaned questions to {output_file}")
     except Exception as e:

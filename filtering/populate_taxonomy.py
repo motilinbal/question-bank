@@ -26,7 +26,7 @@ class TaxonomyImporter:
         """Initialize the importer with database connection."""
         # Get MongoDB connection details from environment variables or use defaults
         self.mongo_uri = mongo_uri or os.getenv("MONGO_URI", "mongodb://localhost:27017/")
-        self.db_name = db_name or os.getenv("DB_NAME", "documedica_refactored")
+        self.db_name = db_name or os.getenv("DB_NAME", "documedica")
         self.collection_name = "Taxonomies"
         
         # Connect to MongoDB
@@ -114,10 +114,6 @@ class TaxonomyImporter:
     def create_indexes(self):
         """Create necessary indexes for the Taxonomies collection."""
         collection = self.db[self.collection_name]
-        
-        # Create unique index on _id
-        collection.create_index("_id", unique=True)
-        logger.info("Created unique index on _id")
         
         # Create index on parent_id for efficient parent-child queries
         collection.create_index("parent_id")
@@ -207,37 +203,22 @@ class TaxonomyImporter:
 
 def main():
     """Main function to run the taxonomy import."""
-    # Parse command line arguments
-    parser = argparse.ArgumentParser(description='Import taxonomy data into MongoDB')
-    parser.add_argument('--file', '-f', default='taxonomy.json',
-                       help='Path to taxonomy JSON file (default: taxonomy.json)')
-    parser.add_argument('--mongo-uri', '-u',
-                       help='MongoDB connection URI (default: from MONGO_URI env var or mongodb://localhost:27017/)')
-    parser.add_argument('--db-name', '-d',
-                       help='MongoDB database name (default: from DB_NAME env var or documedica_refactored)')
-    parser.add_argument('--collection', '-c', default='Taxonomies',
-                       help='MongoDB collection name (default: Taxonomies)')
-    parser.add_argument('--no-drop', action='store_true',
-                       help='Do not drop existing collection before import')
-    parser.add_argument('--verbose', '-v', action='store_true',
-                       help='Enable verbose logging')
-    
-    args = parser.parse_args()
-    
-    # Configure logging level
-    if args.verbose:
-        logging.getLogger().setLevel(logging.DEBUG)
+    MONGO_URI = "mongodb://localhost:27017/"
+    DB_NAME = "documedica"
+    COLLECTION_NAME = "Taxonomies"
+    TAXONOMY_FILE = "taxonomy.json"
+    DROP_EXISTING = True
     
     # Initialize importer
     try:
-        importer = TaxonomyImporter(mongo_uri=args.mongo_uri, db_name=args.db_name)
-        importer.collection_name = args.collection
+        importer = TaxonomyImporter(mongo_uri=MONGO_URI, db_name=DB_NAME)
+        importer.collection_name = COLLECTION_NAME
     except Exception as e:
         logger.error(f"Failed to initialize database connection: {e}")
         sys.exit(1)
     
     # Import taxonomy
-    success = importer.import_taxonomy(args.file, drop_existing=not args.no_drop)
+    success = importer.import_taxonomy(TAXONOMY_FILE, drop_existing=DROP_EXISTING)
     
     if success:
         logger.info("Taxonomy import completed successfully")
