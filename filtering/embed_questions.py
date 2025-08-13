@@ -1,101 +1,91 @@
 import re
 import numpy as np
 from sentence_transformers import SentenceTransformer, util
-import weaviate
-from weaviate.classes.config import Configure, Property, DataType
+from pymongo import MongoClient
+import chromadb
+from tqdm import tqdm
 
-# Load the embedding model (downloads automatically if not cached)
-model = SentenceTransformer('BAAI/bge-large-en-v1.5')
+# Load the embedding model
+model = SentenceTransformer("BAAI/bge-large-en-v1.5")
 
-def get_single_embedding(long_text: str, chunk: bool = True, normalize: bool = True) -> np.ndarray:
-    """
-    Generate a single embedding vector for a long string.
-    
-    Args:
-        long_text (str): The input text.
-        chunk (bool): Split into sentences and average embeddings for long texts.
-        normalize (bool): Normalize to unit length.
-    
-    Returns:
-        np.ndarray: The 1024-dim embedding vector.
-    """
+
+def get_single_embedding(
+    long_text: str, chunk: bool = True, normalize: bool = True
+) -> np.ndarray:
+    """Generate a single embedding vector for a long string."""
     if not chunk:
-        embedding = model.encode(long_text, normalize_embeddings=normalize)
-        return embedding
-    
-    # Chunking: Split into sentences
-    sentences = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|\!)\s', long_text)
+        return model.encode(long_text, normalize_embeddings=normalize)
+
+    sentences = re.split(r"(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|\!)\s", long_text)
     sentences = [s.strip() for s in sentences if s.strip()]
-    
+
     if not sentences:
         return np.zeros(model.get_sentence_embedding_dimension())
-    
-    # Encode chunks in batch
-    embeddings = model.encode(sentences, normalize_embeddings=normalize, show_progress_bar=False)
-    
-    # Average and re-normalize
+
+    embeddings = model.encode(
+        sentences, normalize_embeddings=normalize, show_progress_bar=False
+    )
     avg_embedding = np.mean(embeddings, axis=0)
     if normalize:
         avg_embedding /= np.linalg.norm(avg_embedding)
-    
+
     return avg_embedding
 
-# Set up local embedded Weaviate
-client = weaviate.connect_to_embedded(
-    # version="1.26.5",  # Optional: Specify a version; defaults to latest
-    persistence_data_path="./weaviate_data",  # Local persistence directory
-    environment_variables={"LOG_LEVEL": "WARNING"}  # Reduce logs
+
+# MongoDB setup
+mongo_client = MongoClient("mongodb://localhost:27017/")
+db = mongo_client["test_db"]
+mongo_collection = db["Questions"]
+mongo_collection_size = mongo_collection.count_documents({})
+
+# ChromaDB setup
+chroma_client = chromadb.PersistentClient(path="./chromadb")
+chroma_collection = chroma_client.get_or_create_collection(
+    name="Questions", metadata={"hnsw:space": "cosine"}
 )
 
-# Collection name and config (vector dim matches BGE-large-en-v1.5)
-collection_name = "Questions"
-embedding_dim = model.get_sentence_embedding_dimension()  # 1024
+# Batch size for processing (adjust based on memory)
+batch_size = 100
+cursor = mongo_collection.find().batch_size(batch_size)
 
-# Create collection if it doesn't exist (with no built-in vectorizer)
-collections = client.collections.list_all()
-if collection_name not in collections:
-    client.collections.create(
-        name=collection_name,
-        vectorizer_config=Configure.Vectorizer.none(),
-        properties=[
-            Property(name="text", data_type=DataType.TEXT)  # Store original text
-        ],
-        vector_index_config=Configure.VectorIndex.hnsw(  # Efficient index for search
-            ef_construction=128,
-            m=16
-        )
+# Process all questions
+embeddings_batch = []
+ids_batch = []
+embedding_dim = model.get_sentence_embedding_dimension()
+
+for question in tqdm(cursor, total=mongo_collection_size, desc="Embedding Questions"):
+    result = chroma_collection.get(ids=[str(question["_id"])], include=["embeddings"])
+    if (
+        result["ids"]
+        and result["embeddings"] is not None
+        and len(result["embeddings"]) > 0
+    ):
+        embedding = np.array(result["embeddings"][0])
+        if embedding.shape[0] == embedding_dim and np.any(embedding != 0):
+            continue
+
+    embedding_text = (
+        question["title"]
+        + "\n\n"
+        + question["text"]
+        + "\n\n"
+        + "\n\n".join(question["teaching_points"])
     )
+    embedding = get_single_embedding(embedding_text, chunk=True)
 
-# Get the collection
-collection = client.collections.get(collection_name)
+    embeddings_batch.append(embedding.tolist())
+    ids_batch.append(str(question["_id"]))  # Ensure ID is string
 
-# Example usage: Generate and store embedding
-long_string = """
-This is an example of a long string that might exceed the 512-token limit. 
-It contains multiple sentences. For instance, here's one. And another! 
-What about questions? Yes, those too. The goal is to create a single embedding 
-vector representing the entire text without losing key information.
-"""
-embedding = get_single_embedding(long_string, chunk=True)
+    if len(embeddings_batch) == batch_size:
+        # Upsert batch (updates if exists, adds if not)
+        chroma_collection.upsert(embeddings=embeddings_batch, ids=ids_batch)
+        embeddings_batch = []
+        ids_batch = []
 
-# Store in Weaviate (as list for compatibility)
-object_uuid = collection.data.insert({
-    "text": long_string,
-    "vector": embedding.tolist()
-})
-print(f"Stored object with UUID: {object_uuid}")
+# Upsert any remaining in the last batch
+if embeddings_batch:
+    chroma_collection.upsert(embeddings=embeddings_batch, ids=ids_batch)
 
-# Demonstrate search accessibility (near-vector query)
-query_embedding = get_single_embedding("A long text about sentences and questions.", chunk=True)
-response = collection.query.near_vector(
-    near_vector=query_embedding.tolist(),
-    limit=1,
-    return_properties=["text"]
-)
-if response.objects:
-    print("Top match text:", response.objects[0].properties["text"])
-else:
-    print("No matches found.")
+print("All questions embedded and stored in ChromaDB.")
 
-# Cleanup: Close client (embedded instance stops)
-client.close()
+chroma_client.close()

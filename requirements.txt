@@ -64,4 +64,4 @@ fuzzywuzzy
 python-Levenshtein
 sentence-transformers
 huggingface-hub
-weaviate-client
+chromadb
