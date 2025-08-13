@@ -121,6 +121,8 @@ class QuestionService:
             raw_explanation_html=question_doc.get("explanation", ""),
             primary_question_assets=primary_question_assets,
             primary_explanation_assets=primary_explanation_assets,
+            title=question_doc.get("title", ""),
+            teaching_points=question_doc.get("teaching_points", []),
         )
 
         return question_model

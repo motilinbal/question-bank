@@ -105,6 +105,7 @@ with st.sidebar:
     st.title("🔍 Search & Filters")
     all_sources, all_tags = get_filter_options()
 
+    vector_search_query = st.text_input("Free text search")
     search_query = st.text_input("Search by text in question")
     selected_sources = st.multiselect("Filter by Source", options=all_sources)
     selected_tags = st.multiselect("Filter by Tags", options=all_tags)
@@ -590,7 +591,10 @@ def display_question_detail():
             st.rerun()
 
     # --- Display Question Header ---
-    st.subheader(f"Question: {question.name}")
+    if st.session_state.get("show_explanation", False):
+        st.subheader(question.title)
+    else:
+        st.subheader(f"Question: {question.name}")
     st.caption(f"Source: {question.source} | Tags: {', '.join(question.tags)}")
     st.divider()
 
@@ -692,6 +696,30 @@ def display_question_detail():
                     ):
                         st.session_state.asset_to_show = asset.uuid
                         st.rerun()
+
+        # --- TEACHING POINTS ---
+        if question.teaching_points:
+            st.divider()
+            st.markdown("### 🎓 Key Teaching Points")
+            # Create a container for better styling
+            with st.container():
+                for i, point in enumerate(question.teaching_points, 1):
+                    # Using custom HTML for better styling
+                    st.markdown(
+                        f"""
+                        <div style="margin-bottom: 10px; padding: 10px; border-left: 3px solid #007bff; background-color: rgba(0, 123, 255, 0.1); border-radius: 0 8px 8px 0;">
+                            <div style="display: flex; align-items: flex-start;">
+                                <div style="background-color: #007bff; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px; flex-shrink: 0; font-size: {st.session_state.font_size-2}px; line-height: 1; text-align: center; width: 1.8em; height: 1.8em; min-width: 24px; min-height: 24px;">
+                                    {i}
+                                </div>
+                                <div style="padding-top: 2px; font-size: {st.session_state.font_size-2}px;">
+                                    {point}
+                                </div>
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
 
     # --- MODAL DISPLAY LOGIC (DIAGNOSTIC TEST) ---
     if st.session_state.asset_to_show:

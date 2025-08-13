@@ -76,6 +76,13 @@ class Question(BaseModel):
     # List of inline assets found in the HTML content
     inline_assets: list[Union[FileAsset, ContentAsset, LinkAsset]] = []
 
+    # Title of the question
+    title: str = ""
+
+    # List of teaching points
+    teaching_points: list[str] = []
+
+
 
 # MediaItem and Source models remain the same as they describe our *target* schema
 class MediaItem(BaseModel):
