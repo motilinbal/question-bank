@@ -123,6 +123,7 @@ class QuestionService:
             primary_explanation_assets=primary_explanation_assets,
             title=question_doc.get("title", ""),
             teaching_points=question_doc.get("teaching_points", []),
+            text=question_doc.get("text", ""),
         )
 
         return question_model

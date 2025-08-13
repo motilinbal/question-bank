@@ -46,6 +46,22 @@ def get_filter_options():
         return [], []
 
 
+def build_text_search_query(search_text):
+    """Build appropriate text search query based on number of terms."""
+    search_terms = [t.strip() for t in search_text.split() if t.strip()]
+    
+    if not search_terms:
+        return {}
+    
+    if len(search_terms) == 1:
+        # Single term: Use regex for flexible matching
+        return {"text": {"$regex": search_terms[0], "$options": "i"}}
+    else:
+        # Multiple terms: Use MongoDB text search with AND relationship
+        mongo_search = " ".join([f'"{t}"' for t in search_terms])
+        return {"$text": {"$search": mongo_search}}
+
+
 def get_random_question_id(query):
     """Fetches a single random question ID matching the filter criteria."""
     if db_client.db is None:
@@ -107,9 +123,9 @@ with st.sidebar:
     all_sources, all_tags = get_filter_options()
 
     vector_search_query = st.text_input("Free text search")
-    search_query = st.text_input("Search by text in question")
+    search_query = st.text_input("Exact search terms")
     selected_sources = st.multiselect("Filter by Source", options=all_sources)
-    selected_tags = st.multiselect("Filter by Tags", options=all_tags)
+    # selected_tags = st.multiselect("Filter by Tags", options=all_tags)
     st.markdown("---")
     show_favorites_only = st.checkbox("Show Favorites Only ⭐")
     show_done_only = st.checkbox("Show Done Only 🔖")
@@ -120,24 +136,31 @@ with st.sidebar:
         # Build the current query again, just as we do for the list view
         mongo_query = {}
         
-        # First, apply vector search if query is provided
+        # Track if we're using vector search for ordering
+        vector_search_ids = None
+        using_vector_search = False
+        
+        # Stage 1: Vector Search (if applicable)
         if vector_search_query and vector_search_query.strip():
+            using_vector_search = True
             vector_search_ids = perform_vector_search(vector_search_query)
             # If vector search returns results, filter by those IDs
             if vector_search_ids:
                 mongo_query["_id"] = {"$in": vector_search_ids}
-            # If vector search returns no results, we'll show no results
-            # (empty mongo_query["_id"] list will match nothing)
+            else:
+                # If vector search returns no results, we'll show no results
+                mongo_query["_id"] = {"$in": []}
         
-        # Then apply other filters
+        # Stage 2: Text Search (always applied as filter)
         if search_query:
-            search_terms = search_query.split()
-            formatted_search = " ".join(['"' + term + '"' for term in search_terms])
-            mongo_query["$text"] = {"$search": formatted_search}
+            text_search_query = build_text_search_query(search_query)
+            mongo_query.update(text_search_query)
+        
+        # Apply other filters
         if selected_sources:
             mongo_query["source"] = {"$in": selected_sources}
-        if selected_tags:
-            mongo_query["tags"] = {"$in": selected_tags}
+        # if selected_tags:
+        #     mongo_query["tags"] = {"$in": selected_tags}
         if show_favorites_only:
             mongo_query["difficult"] = True
         if show_done_only:
@@ -146,7 +169,28 @@ with st.sidebar:
             mongo_query["flagged"] = {"$ne": True}
 
         # Fetch a random question ID using the current filters
-        random_id = get_random_question_id(mongo_query)
+        # For vector search, we want to maintain the order
+        if using_vector_search and vector_search_ids:
+            # Get all matching questions and select the first one (most relevant)
+            collection = db_client.get_collection("Questions")
+            matching_questions = list(collection.find(mongo_query, {"_id": 1}))
+            
+            if matching_questions:
+                # Find the first question that's in our vector search results
+                for doc in matching_questions:
+                    doc_id = str(doc["_id"])
+                    if doc_id in vector_search_ids:
+                        random_id = doc_id
+                        break
+                else:
+                    # If no vector search results match, pick first available
+                    random_id = str(matching_questions[0]["_id"])
+            else:
+                random_id = None
+        else:
+            # Normal random selection
+            random_id = get_random_question_id(mongo_query)
+        
         if random_id:
             # If we found a question, set it as the selected one and rerun
             st.session_state.selected_question_id = random_id
@@ -368,8 +412,8 @@ def display_question_list():
         current_query["text"] = search_query
     if selected_sources:
         current_query["source"] = {"$in": selected_sources}
-    if selected_tags:
-        current_query["tags"] = {"$in": selected_tags}
+    # if selected_tags:
+    #     current_query["tags"] = {"$in": selected_tags}
     if show_favorites_only:
         current_query["is_favorite"] = True
     if show_done_only:
@@ -385,24 +429,27 @@ def display_question_list():
         # Build MongoDB query
         mongo_query = {}
         
-        # First, apply vector search if query is provided
+        # Track if we're using vector search for ordering
         vector_search_ids = None
+        using_vector_search = False
+        
+        # Stage 1: Vector Search (if applicable)
         if vector_search_query and vector_search_query.strip():
+            using_vector_search = True
             vector_search_ids = perform_vector_search(vector_search_query)
             # If vector search returns results, filter by those IDs
             if vector_search_ids:
                 mongo_query["_id"] = {"$in": vector_search_ids}
-            # If vector search returns no results, we'll show no results
-            # (empty mongo_query["_id"] list will match nothing)
+            else:
+                # If vector search returns no results, we'll show no results
+                mongo_query["_id"] = {"$in": []}
         
-        # Then apply text search filter
+        # Stage 2: Text Search (always applied as filter)
         if "text" in current_query:
-            # Text search in question and explanation fields
-            mongo_query["$or"] = [
-                {"question": {"$regex": current_query["text"], "$options": "i"}},
-                {"explanation": {"$regex": current_query["text"], "$options": "i"}},
-                {"name": {"$regex": current_query["text"], "$options": "i"}},
-            ]
+            text_search_query = build_text_search_query(current_query["text"])
+            mongo_query.update(text_search_query)
+        
+        # Apply other filters
         if "source" in current_query:
             mongo_query["source"] = current_query["source"]
         if "tags" in current_query:
@@ -427,29 +474,67 @@ def display_question_list():
             total_count + st.session_state.page_size - 1
         ) // st.session_state.page_size
 
-        # Get paginated results
-        cursor = (
-            db_client.get_collection("Questions")
-            .find(mongo_query)
-            .skip(skip)
-            .limit(st.session_state.page_size)
-        )
-        questions = []
-
-        for doc in cursor:
-            # Create a simple question object for the list view
-            question_obj = type(
-                "Question",
-                (),
-                {
-                    "question_id": doc["_id"],
-                    "source": doc.get("source", ""),
-                    "tags": doc.get("tags", []),
-                    "is_favorite": doc.get("difficult", False),
-                    "difficult": doc.get("difficult", False),
-                },
-            )()
-            questions.append(question_obj)
+        # Get paginated results with appropriate sorting
+        collection = db_client.get_collection("Questions")
+        
+        if using_vector_search and vector_search_ids:
+            # Vector search mode: Maintain vector search order
+            # Get all results and sort by vector search order
+            all_results = list(collection.find(mongo_query))
+            
+            # Create a mapping of ID to vector search position
+            id_to_position = {id: idx for idx, id in enumerate(vector_search_ids)}
+            
+            # Sort results by vector search order
+            def vector_sort_key(doc):
+                doc_id = str(doc["_id"])
+                return id_to_position.get(doc_id, len(vector_search_ids))  # Put non-vector results at end
+            
+            sorted_results = sorted(all_results, key=vector_sort_key)
+            
+            # Apply pagination to sorted results
+            paginated_results = sorted_results[skip:skip + st.session_state.page_size]
+            questions = []
+            
+            for doc in paginated_results:
+                question_obj = type(
+                    "Question",
+                    (),
+                    {
+                        "question_id": doc["_id"],
+                        "source": doc.get("source", ""),
+                        "tags": doc.get("tags", []),
+                        "is_favorite": doc.get("difficult", False),
+                        "difficult": doc.get("difficult", False),
+                    },
+                )()
+                questions.append(question_obj)
+        else:
+            # Text search mode: Sort by text relevance scores
+            if "$text" in mongo_query:
+                # If using text search, sort by relevance score
+                cursor = collection.find(
+                    mongo_query,
+                    {"score": {"$meta": "textScore"}}
+                ).sort("score", -1).skip(skip).limit(st.session_state.page_size)
+            else:
+                # Normal sorting
+                cursor = collection.find(mongo_query).skip(skip).limit(st.session_state.page_size)
+            
+            questions = []
+            for doc in cursor:
+                question_obj = type(
+                    "Question",
+                    (),
+                    {
+                        "question_id": doc["_id"],
+                        "source": doc.get("source", ""),
+                        "tags": doc.get("tags", []),
+                        "is_favorite": doc.get("difficult", False),
+                        "difficult": doc.get("difficult", False),
+                    },
+                )()
+                questions.append(question_obj)
 
         st.session_state.question_list = questions
         st.session_state.total_questions = total_count
