@@ -26,3 +26,6 @@ AUDIO_DIR = os.path.join(STATIC_DIR, "audio")
 # AUDIO_DIR = '/home/motilin/Documents/Medical/Docs/Mongo_Banks/Media_test/Audio'
 # VIDEO_DIR = '/home/motilin/Documents/Medical/Docs/Mongo_Banks/Media_test/Videos'
 
+# --- Vector Search Configuration ---
+VECTOR_SEARCH_RESULTS_COUNT = int(os.getenv("VECTOR_SEARCH_RESULTS_COUNT", "100"))
+

@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from database_helpers import get_image_dimensions
 import re
 import textwrap
+from vector_search_service import perform_vector_search
 
 # --- Initial Page Config ---
 st.set_page_config(
@@ -118,6 +119,17 @@ with st.sidebar:
     if st.button("Surprise Me", use_container_width=True, type="secondary"):
         # Build the current query again, just as we do for the list view
         mongo_query = {}
+        
+        # First, apply vector search if query is provided
+        if vector_search_query and vector_search_query.strip():
+            vector_search_ids = perform_vector_search(vector_search_query)
+            # If vector search returns results, filter by those IDs
+            if vector_search_ids:
+                mongo_query["_id"] = {"$in": vector_search_ids}
+            # If vector search returns no results, we'll show no results
+            # (empty mongo_query["_id"] list will match nothing)
+        
+        # Then apply other filters
         if search_query:
             search_terms = search_query.split()
             formatted_search = " ".join(['"' + term + '"' for term in search_terms])
@@ -372,6 +384,18 @@ def display_question_list():
     try:
         # Build MongoDB query
         mongo_query = {}
+        
+        # First, apply vector search if query is provided
+        vector_search_ids = None
+        if vector_search_query and vector_search_query.strip():
+            vector_search_ids = perform_vector_search(vector_search_query)
+            # If vector search returns results, filter by those IDs
+            if vector_search_ids:
+                mongo_query["_id"] = {"$in": vector_search_ids}
+            # If vector search returns no results, we'll show no results
+            # (empty mongo_query["_id"] list will match nothing)
+        
+        # Then apply text search filter
         if "text" in current_query:
             # Text search in question and explanation fields
             mongo_query["$or"] = [
